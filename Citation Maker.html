@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="Midnight Blue">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GVCR LEO Citation Tool </title>
+<style>
+  :root {
+    /* Semantic colors — constant across every theme so meaning never changes */
+    --green:#22c55e; --green-d:#052e16;
+    --orange:#f97316; --orange-d:#431407;
+    --red:#ef4444; --red-d:#3b0a0a;
+    --yellow:#eab308; --cyan:#06b6d4;
+    --gold:#b45309; --gold-h:#fde047;
+    --class-citation-border:#166534; --class-misdemeanor-border:#9a3412; --class-felony-border:#991b1b;
+
+    /* Midnight Blue (default) */
+    --bg:#05070d; --panel:#080e1a; --card:#0c1423; --card2:#0f192c;
+    --border:#162035; --border2:#1c2d48;
+    --accent:#3b82f6; --accent-h:#60a5fa;
+    --indigo:#6366f1; --indigo-h:#818cf8;
+    --text:#f1f5f9; --text2:#94a3b8;
+    --muted:#475569; --muted2:#1e293b;
+    --sel:#1e3a5f; --input-bg:#080f1e;
+  }
+  html[data-theme="Slate"] {
+    --bg:#0a0a0c; --panel:#131316; --card:#18181c; --card2:#1e1e23;
+    --border:#2a2a30; --border2:#34343c;
+    --accent:#71717a; --accent-h:#a1a1aa;
+    --indigo:#8b8b95; --indigo-h:#adadb8;
+    --text:#f4f4f5; --text2:#a1a1aa;
+    --muted:#52525b; --muted2:#27272a;
+    --sel:#3f3f46; --input-bg:#0f0f12;
+  }
+  html[data-theme="Emerald"] {
+    --bg:#04100a; --panel:#08170f; --card:#0b1f14; --card2:#0f2819;
+    --border:#173a26; --border2:#1d4a2f;
+    --accent:#10b981; --accent-h:#34d399;
+    --indigo:#0d9488; --indigo-h:#2dd4bf;
+    --text:#ecfdf5; --text2:#a7f3d0;
+    --muted:#3f6a52; --muted2:#1a3324;
+    --sel:#155e3f; --input-bg:#061a10;
+  }
+  html[data-theme="Crimson"] {
+    --bg:#10040a; --panel:#180810; --card:#1f0b15; --card2:#280f1b;
+    --border:#3a1727; --border2:#4a1d31;
+    --accent:#e11d48; --accent-h:#fb7185;
+    --indigo:#be123c; --indigo-h:#f43f5e;
+    --text:#fff1f2; --text2:#fda4af;
+    --muted:#6a3f4c; --muted2:#331a24;
+    --sel:#5e1530; --input-bg:#1a0610;
+  }
+  html[data-theme="Cyberpunk"] {
+    --bg:#08040f; --panel:#100819; --card:#160b21; --card2:#1c0f2a;
+    --border:#2d1642; --border2:#3a1c56;
+    --accent:#ec4899; --accent-h:#f472b6;
+    --indigo:#8b5cf6; --indigo-h:#a78bfa;
+    --text:#faf5ff; --text2:#d8b4fe;
+    --muted:#5b4a6f; --muted2:#241333;
+    --sel:#4c1d6e; --input-bg:#12081c;
+  }
+  html[data-theme="Sunset"] {
+    --bg:#100a04; --panel:#180f08; --card:#20140a; --card2:#291a0d;
+    --border:#3d2712; --border2:#4d3117;
+    --accent:#f97316; --accent-h:#fb923c;
+    --indigo:#ea580c; --indigo-h:#f97316;
+    --text:#fff7ed; --text2:#fed7aa;
+    --muted:#6f5138; --muted2:#33220f;
+    --sel:#5c3416; --input-bg:#180d05;
+  }
+
+  * { box-sizing: border-box; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); }
+  body {
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    color:var(--text);
+    display:flex; flex-direction:column; height:100vh; overflow:hidden;
+    transition: background .25s ease;
+  }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-track { background:var(--card); }
+  ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:4px; }
+
+  button { font-family:inherit; cursor:pointer; border:none; }
+  input, button { outline:none; }
+
+  /* ── Splash ─────────────────────────────────────────────────────────── */
+  #splash {
+    position:fixed; inset:0; background:var(--bg); z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    transition: opacity .4s ease;
+  }
+  #splash.hide { opacity:0; pointer-events:none; }
+  .splash-box {
+    border:1px solid var(--accent); padding:36px 48px; border-radius:4px;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+  }
+  .splash-box img { width:96px; height:96px; margin-bottom:14px; }
+  .splash-box h1 { font-size:19px; margin:0 0 4px; letter-spacing:.5px; }
+  .splash-box p { font-size:12px; color:var(--muted); margin:0 0 20px; }
+  .splash-track { width:280px; height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .splash-fill { height:100%; width:0%; background:var(--accent); transition:width .5s ease; }
+  .splash-status { font-size:11px; color:var(--muted); margin-top:8px; }
+
+  /* ── Topbar ─────────────────────────────────────────────────────────── */
+  #topbar {
+    display:flex; align-items:center; gap:14px;
+    background:var(--panel); padding:8px 14px; border-bottom:1px solid var(--border);
+    flex-shrink:0; flex-wrap:wrap;
+  }
+  #topbar img.logo { width:38px; height:38px; border-radius:6px; }
+  .brand h1 { font-size:15px; margin:0; font-weight:700; }
+  .brand .sub { font-size:11px; color:var(--muted); display:flex; align-items:center; gap:4px; }
+  .shiny { background:linear-gradient(90deg, var(--gold), var(--gold-h), var(--gold)); background-size:200% auto;
+           -webkit-background-clip:text; background-clip:text; color:transparent; font-weight:700;
+           animation:none; cursor:default; }
+  .shiny:hover { animation:shine 1.4s linear infinite; }
+  @keyframes shine { to { background-position:-200% center; } }
+
+  .nav { display:flex; gap:6px; margin-left:8px; flex-wrap:wrap; }
+  .nav-btn {
+    background:var(--card2); color:var(--muted); font-size:12px; font-weight:600;
+    padding:8px 14px; border-radius:6px; transition:background .35s ease,color .2s ease;
+  }
+  .nav-btn:hover { background:var(--border); }
+  .nav-btn.active { background:var(--accent); color:var(--text); }
+  .nav-btn.active:hover { background:var(--accent-h); }
+
+  .spacer { flex:1; }
+  .icon-btn {
+    background:var(--card2); color:var(--text2); font-size:15px; padding:7px 11px;
+    border-radius:6px; transition:background .15s ease;
+  }
+  .icon-btn:hover { background:var(--border); }
+  .pill {
+    background:var(--border2); color:var(--accent); font-weight:700; font-size:12px;
+    padding:6px 12px; border-radius:6px;
+  }
+  .search-box {
+    display:flex; align-items:center; gap:6px; background:var(--card2);
+    border:1px solid var(--border2); border-radius:6px; padding:5px 10px;
+  }
+  .search-box input { background:transparent; color:var(--text); border:none; font-size:12px; width:150px; }
+  .search-box span { color:var(--muted); }
+
+  /* ── Layout ─────────────────────────────────────────────────────────── */
+  #content { flex:1; overflow:hidden; position:relative; }
+  .tab-panel { position:absolute; inset:0; display:none; padding:14px; gap:14px; overflow:hidden; }
+  .tab-panel.active { display:flex; }
+  .col-left { flex:1; display:flex; flex-direction:column; min-width:0; gap:8px; }
+  .col-right { width:390px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; overflow-y:auto; padding-right:2px; }
+
+  .card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:14px 16px; }
+  .card-flat { background:var(--card); border-radius:8px; }
+  .section-label { font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.4px; margin:0 0 8px; }
+  hr.div { border:none; border-top:1px solid var(--border); margin:8px 0; }
+
+  label.field-label { display:block; font-size:11px; color:var(--text2); margin-bottom:4px; }
+  .field-wrap { border:1px solid var(--border2); border-radius:6px; overflow:hidden; margin-bottom:10px; }
+  .field-wrap input, .field-wrap textarea {
+    width:100%; background:var(--input-bg); color:var(--text); border:none; padding:9px 10px; font-size:13px;
+    font-family:inherit;
+  }
+  .field-wrap input::placeholder { color:var(--muted); }
+
+  .btn { border-radius:6px; font-weight:700; font-size:13px; padding:10px 16px; transition:background .15s ease; color:var(--text); }
+  .btn-accent { background:var(--accent); } .btn-accent:hover { background:var(--accent-h); }
+  .btn-indigo { background:var(--indigo); } .btn-indigo:hover { background:var(--indigo-h); }
+  .btn-green { background:var(--green-d); color:var(--green); } .btn-green:hover { background:#073d1a; }
+  .btn-red { background:var(--red-d); color:var(--red); } .btn-red:hover { background:#500d0d; }
+  .btn-row { display:flex; gap:8px; }
+  .btn-row .btn { flex:1; }
+  .btn-small { font-size:11px; padding:5px 10px; }
+
+  /* ── Section tab strip + code list ─────────────────────────────────── */
+  .sec-strip { display:flex; gap:6px; flex-wrap:wrap; background:var(--card); border-radius:8px; padding:8px; }
+  .sec-btn { background:var(--card2); color:var(--muted); font-size:11px; font-weight:600; padding:7px 11px; border-radius:6px; transition:background .35s ease,color .2s ease; }
+  .sec-btn:hover { background:var(--border); }
+  .sec-btn.active { background:var(--accent); color:var(--text); }
+
+  .code-list-wrap { flex:1; overflow-y:auto; background:var(--card); border:1px solid var(--border); border-radius:8px; }
+  .code-header-row { background:var(--indigo); color:var(--text); padding:10px 14px; font-weight:700; font-size:13px; position:sticky; top:0; z-index:2; }
+  .col-heads { display:flex; background:var(--card2); padding:6px 10px; font-size:10px; font-weight:700; color:var(--muted); position:sticky; top:34px; z-index:1; }
+  .col-heads span:nth-child(1){width:70px;} .col-heads span:nth-child(2){flex:1;} .col-heads span:nth-child(3){width:170px;} .col-heads span:nth-child(4){width:90px;}
+
+  .code-row { display:flex; align-items:center; padding:6px 8px; border-left:3px solid transparent; gap:8px; }
+  .code-row:nth-child(odd) { background:var(--card); }
+  .code-row:nth-child(even) { background:var(--card2); }
+  .code-row:hover { background:var(--sel) !important; cursor:pointer; }
+  .code-row.cls-Citation { border-left-color:var(--class-citation-border); }
+  .code-row.cls-Misdemeanor { border-left-color:var(--class-misdemeanor-border); }
+  .code-row.cls-Felony { border-left-color:var(--class-felony-border); }
+  .badge { font-family:"Courier New",monospace; font-weight:700; font-size:11px; padding:5px 7px; border-radius:4px; width:56px; text-align:center; flex-shrink:0; }
+  .badge.cls-Citation { background:var(--green-d); color:var(--green); }
+  .badge.cls-Misdemeanor { background:var(--orange-d); color:var(--orange); }
+  .badge.cls-Felony { background:var(--red-d); color:var(--red); }
+  .ref-text { flex:1; font-size:12px; color:var(--text2); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ref-text.match { color:var(--yellow); }
+  .pen-text { width:170px; font-size:11px; color:var(--muted); flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cls-pill { width:80px; text-align:center; font-size:9px; font-weight:700; padding:3px 0; border-radius:4px; flex-shrink:0; }
+  .cls-pill.cls-Citation { background:var(--green-d); color:var(--green); }
+  .cls-pill.cls-Misdemeanor { background:var(--orange-d); color:var(--orange); }
+  .cls-pill.cls-Felony { background:var(--red-d); color:var(--red); }
+  .add-btn { background:var(--indigo); color:var(--text); font-size:11px; font-weight:700; padding:5px 10px; border-radius:5px; flex-shrink:0; }
+  .add-btn:hover { background:var(--indigo-h); }
+
+  /* ── Charge queue + chart ──────────────────────────────────────────── */
+  .totals-row { display:flex; justify-content:space-between; align-items:center; }
+  .totals-row .amt { font-size:11px; font-weight:700; color:var(--yellow); }
+  .queue-wrap { max-height:150px; overflow-y:auto; background:var(--card); border:1px solid var(--border); border-radius:8px; }
+  .queue-row { display:flex; align-items:center; gap:8px; padding:6px 10px; }
+  .queue-row .badge { width:52px; font-size:10px; padding:4px; }
+  .queue-row .ref-text { font-size:11px; }
+  .rm-btn { color:var(--red); font-weight:700; background:none; padding:2px 6px; }
+  .empty-note { color:var(--muted); font-size:12px; padding:14px; text-align:center; }
+
+  .chart-wrap { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:10px 12px; }
+  .chart-row { display:flex; align-items:center; gap:8px; font-size:10px; margin:5px 0; }
+  .chart-row .clabel { width:70px; color:var(--muted); flex-shrink:0; }
+  .chart-track { flex:1; height:9px; background:var(--card2); border-radius:5px; overflow:hidden; }
+  .chart-fill { height:100%; border-radius:5px; width:0%; transition:width .5s cubic-bezier(.2,.8,.3,1); }
+  .chart-row .cval { width:22px; text-align:right; font-weight:700; color:var(--text); flex-shrink:0; }
+
+  /* ── Output ─────────────────────────────────────────────────────────── */
+  .output-box {
+    flex:1; background:var(--card); border:1px solid var(--border); border-radius:8px;
+    padding:12px; font-family:"Courier New",monospace; font-size:12px; color:var(--text);
+    white-space:pre-wrap; overflow-y:auto; min-height:110px;
+  }
+
+  /* ── Notice bar ─────────────────────────────────────────────────────── */
+  .notice { display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--card2);
+            border:1px solid var(--accent); border-radius:8px; padding:10px 14px; font-size:12px; color:var(--cyan); }
+
+  /* ── Locked vehicle block ──────────────────────────────────────────── */
+  .locked-row { display:flex; padding:3px 0; font-size:12px; }
+  .locked-row .lk-label { width:190px; color:var(--text2); }
+  .locked-row .lk-val { color:var(--muted); font-weight:700; }
+
+  /* ── License plate (kept for visual flavor even though values are N/A) */
+  .plate-outer { display:inline-block; background:#6b7fa3; padding:3px; border-radius:8px; }
+  .plate-inner { background:#193468; padding:8px 16px; border-radius:6px; min-width:170px; text-align:center; }
+  .plate-top,.plate-bot { font-size:9px; color:#93c5fd; display:flex; justify-content:space-between; }
+  .plate-top b { color:#fbbf24; font-size:10px; letter-spacing:1px; }
+  .plate-num { font-family:"Courier New",monospace; font-size:26px; font-weight:700; color:#fff; letter-spacing:3px; margin:4px 0; }
+
+  /* ── Quick phrases ─────────────────────────────────────────────────── */
+  .phr-columns { display:flex; gap:16px; flex:1; overflow-y:auto; }
+  .phr-col { flex:1; display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .phr-cat-header { display:flex; align-items:center; gap:8px; background:var(--card2); padding:9px 14px; border-radius:6px; margin-bottom:2px; }
+  .phr-cat-header .stripe { width:3px; height:16px; border-radius:2px; }
+  .phr-cat-header span { font-size:13px; font-weight:700; }
+  .phr-row { display:flex; align-items:center; gap:10px; background:var(--card); padding:8px 10px; border-left:3px solid var(--card); border-radius:2px; cursor:pointer; transition:background .15s ease; }
+  .phr-row:hover { background:var(--border); }
+  .phr-label { width:170px; flex-shrink:0; font-size:12px; font-weight:700; color:var(--text2); }
+  .phr-label.dyn { color:var(--cyan); }
+  .phr-text { flex:1; font-size:12px; color:var(--muted); }
+  .phr-copied { width:60px; text-align:right; font-size:11px; font-weight:700; color:var(--green); flex-shrink:0; }
+
+  /* ── Dispatch ──────────────────────────────────────────────────────── */
+  .dispatch-input-row { display:flex; gap:6px; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px; }
+  .dispatch-input-row input { flex:1; background:var(--input-bg); color:var(--text); border:none; border-radius:6px; padding:9px 10px; font-size:13px; }
+  .mic-btn { background:var(--card2); color:var(--text2); font-size:16px; padding:8px 14px; border-radius:6px; }
+  .mic-btn:hover { background:var(--border); }
+  .mic-btn.listening { background:var(--red); color:#fff; animation:pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.55; } }
+  .dispatch-log { flex:1; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px; font-family:"Courier New",monospace; font-size:12px; overflow-y:auto; white-space:pre-wrap; }
+  .dispatch-log .echo { color:var(--text2); }
+  .dispatch-log .reply { color:var(--green); }
+  .mic-hint { font-size:11px; color:var(--muted); margin-top:6px; }
+
+  /* ── Modals ────────────────────────────────────────────────────────── */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center; z-index:500; }
+  .modal-overlay.hidden { display:none; }
+  .modal-box { background:var(--bg); border:1px solid var(--border); border-radius:10px; width:520px; max-height:86vh; overflow-y:auto; padding:20px 24px; }
+  .modal-box h2 { margin:0 0 4px; font-size:17px; }
+  .modal-box .modal-sub { font-size:12px; color:var(--muted); margin:0 0 16px; }
+  .modal-close-row { display:flex; justify-content:flex-end; margin-top:14px; }
+  .theme-row { display:flex; gap:10px; flex-wrap:wrap; }
+  .theme-swatch { width:42px; height:32px; border-radius:6px; cursor:pointer; border:2px solid transparent; }
+  .theme-swatch.active { border-color:var(--text); }
+  .theme-item { text-align:center; }
+  .theme-item span { display:block; font-size:9px; color:var(--muted); margin-top:4px; }
+
+  .hist-stats { display:flex; gap:8px; margin-bottom:10px; }
+  .hist-stat { flex:1; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:10px; text-align:center; }
+  .hist-stat .num { font-size:22px; font-weight:800; }
+  .hist-stat .lbl { font-size:10px; color:var(--muted); }
+  .hist-list { max-height:280px; overflow-y:auto; background:var(--card); border:1px solid var(--border); border-radius:8px; }
+  .hist-item { padding:8px 12px; cursor:pointer; }
+  .hist-item:nth-child(odd) { background:var(--card); } .hist-item:nth-child(even) { background:var(--card2); }
+  .hist-item:hover { filter:brightness(1.3); }
+  .hist-item .htop { display:flex; justify-content:space-between; font-size:9px; }
+  .hist-item .htag { padding:2px 6px; border-radius:3px; font-weight:700; }
+  .hist-item .hprev { font-size:11px; color:var(--text2); margin-top:3px; }
+
+  /* ── Toasts ────────────────────────────────────────────────────────── */
+  #toast-container { position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:8px; z-index:900; }
+  .toast { background:#071a0d; border-top:2px solid var(--green); color:var(--green); font-size:13px; font-weight:700;
+           padding:10px 16px; border-radius:6px; opacity:0; transform:translateY(8px); transition:opacity .25s ease, transform .25s ease; }
+  .toast.show { opacity:1; transform:translateY(0); }
+
+  .hidden { display:none !important; }
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="splash-box">
+    <img class="logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAABgFBMVEUAAAABAQECAQMDAQUFAQEFAgoIAgIJAggDAQAMAgIEAg4XAgMRAgMGAxUKAQIIBB0IBSgdAgUMAg9CAwclAgQHBzAWAxsuAwUOHGYICjobBw4IDkhqBwuKCAwXQqIUAg8lAhKpEhgZDh8pEBjvFhjdDhryHB14DA0TOKQdNI4SUMIbGyk3AwgWBisTEF78FxwKFFexCTDtoE4mCzAkGkVaBAUNL50XDkI+Ch6VjqKShZscO9y9BgM8EmB92+5sEDYOFXFTChR2gbUeKH8LWM0fOcfuIS7maknpR1FFPGNkRXUxFmorEyeTTHKDkbUNJY54CEbo+/QSIMSmFCoXK8jhMzKKxOvFFRoiet9xx+fTV3ZGquEnZNStZoYvb93LS2Xwr2UPH3qkdY3wOUtYBh7dSEJLCkM/RYJ8BidsMWuHCkcGK3+9S3GfAQDsMyGOMmMqPcHCMlMMRLnuv1Ukg+UjSd1WtOnrNkpFm+OZ9PKo3eSIgq3mhVHn6n7r5o7nynXKuKGoAAACw0lEQVRIx+2VV1fbQBCFkVbatSwhWXLHAjvuBdv0Dsb0Tmihl0B67z3hr2dmJUpCwjl5Dt/xi33unVmN5q4bGm74DxE44jkeUYTv1xtEcg6VJPhIHuGa6iLqGZNlmQGU6jqlVILfhaud8FcR1VyPBoWDDkkUf7MIHgDa8+pexGJM4ygUuhDHcOFAsUSpI29ELEvTVERTFJ0SIpJLPQSsTrke5QZixeMmR4UmjIGDH8ut70E51RmzQO7jhEJNiTAQCIAFO3OLYxCwvKLDA4LB8AWj0WgQDIlWPxIOmNCCEHAQ3kIQoL6uaE1IshyNtUUikbbezs6+up3L5ex6XyqVTCYNr0ycQ6EeijelUqmFha6uyHihBXg4N7e4+OxwZ2f/+HhgoL+/f6BEZD6rBl5fVevNSG14PP+mOFFsKcw+fvn648nJzMzh/texsbGlpVmCPbgBzqOauXQ1m622jx982h4Z+VAsDN9uz3S8PeqY3qgVJicnXxVKFnMMEgV5OJzLZDbuT62N7u1+WVm5M5EfftKeOfr+43R66t7d94Pr68sl5h4JRgQdNDudTmera6MHu9sjn8Ewjx06vk3PgGFwdXWwp+To8aE9MFTFfwupVVqKe1vvtor5+QePNl9kq9n0Zr23UqlEupIyH6vgjBV6qGYgESqXY6PLPfmep5Hezj77+dDQUHN3a0DVdF13pyrwzcDBgiUeCvnc9xALlhP+btu2u/1hE940I259d5fwVSuKZRmGLxqNxWIXr7o1DA0U6urPDNxBGd8MXxDxGQYsXwAwYTP4ul5OBDpwu2UvrCrfPcNotOKq6e731TxgOiE+kIZGZ73dRMBqYxyuJu4s/zxuPEBeL6RU55mmErmIwq+hhkdzAgpAAvAagCSKHuHPl417acgOOBciuWf/++2EQeSXkng2l+vUl68/3IGbv4Ib/oWfYBlYP6inUyAAAAAASUVORK5CYII=" alt="logo"
+    <h1>CITATION TOOL</h1>
+    <p>Greenville Community Roleplay · Public Services</p>
+    <div class="splash-track"><div class="splash-fill" id="splashFill"></div></div>
+    <div class="splash-status" id="splashStatus">Starting...</div>
+  </div>
+</div>
+
+<header id="topbar">
+  <img class="logo" src="data:image/png;base64,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" alt="logo">
+  <div class="brand">
+    <h1>Citation Tool</h1>
+    <div class="sub">Greenville Community Roleplay · Public Services · <span class="shiny">Made by x3alpy and ababyboi</span></div>
+  </div>
+  <nav class="nav" id="navTabs"></nav>
+  <div class="spacer"></div>
+  <div class="pill" id="chargeCountPill">0 charges</div>
+  <div class="search-box"><span>⌕</span><input id="searchInput" placeholder="Search penal codes..."></div>
+  <button class="icon-btn" id="historyBtn" title="History">🕘</button>
+  <button class="icon-btn" id="settingsBtn" title="Settings">⚙</button>
+</header>
+
+<main id="content">
+
+  <!-- ── CITATION TAB ─────────────────────────────────────────────────── -->
+  <section class="tab-panel active" id="tab-citation">
+    <div class="col-left">
+      <div class="sec-strip" id="secStrip"></div>
+      <div class="code-list-wrap" id="codeListWrap"></div>
+    </div>
+    <div class="col-right">
+      <div class="card">
+        <p class="section-label">Citation Details</p>
+        <hr class="div">
+        <label class="field-label">Ticket Provider</label>
+        <div class="field-wrap"><input id="fProvider" placeholder="Officer name..."></div>
+        <label class="field-label">Offender</label>
+        <div class="field-wrap"><input id="fOffender" placeholder="Offender name..."></div>
+      </div>
+      <div class="totals-row">
+        <p class="section-label" style="margin:0">Charges</p>
+        <span class="amt" id="citTotals"></span>
+      </div>
+      <div class="chart-wrap" id="citChart"></div>
+      <div class="queue-wrap" id="citQueue"></div>
+      <div class="btn-row">
+        <button class="btn btn-red" id="clearBtn">✕ Clear All</button>
+        <button class="btn btn-accent" id="genCitBtn">⚡ Generate</button>
+      </div>
+      <button class="btn btn-green" id="copyCitBtn" style="width:100%">📋 Copy to Clipboard</button>
+      <p class="section-label" style="margin-top:4px">Output</p>
+      <div class="output-box" id="citOutput">Add charges from the left, fill in the details above, then hit ⚡ Generate.</div>
+    </div>
+  </section>
+
+  <!-- ── ARREST TAB ───────────────────────────────────────────────────── -->
+  <section class="tab-panel" id="tab-arrest">
+    <div class="col-left" style="overflow-y:auto;">
+      <div class="notice">
+        <span>⚡ Charges from the Citation tab are shared automatically.</span>
+        <button class="btn btn-accent btn-small" data-goto="citation">→ Add Charges</button>
+      </div>
+      <p class="section-label">Report Details</p>
+      <div class="card">
+        <label class="field-label">Involved Officer(s)</label>
+        <div class="field-wrap"><input id="aOfficers" placeholder="@Officer1, @Officer2"></div>
+        <label class="field-label">Department(s)</label>
+        <div class="field-wrap"><input id="aDept" placeholder="e.g. LCPD, BCSO"></div>
+        <label class="field-label">Suspect(s)</label>
+        <div class="field-wrap"><input id="aSuspects" placeholder="@Suspect1, @Suspect2"></div>
+      </div>
+      <p class="section-label">Charge Breakdown</p>
+      <div class="chart-wrap" id="arrChart"></div>
+      <p class="section-label">Vehicle Information</p>
+      <div class="card">
+        <p style="font-size:11px;color:var(--muted);margin:0 0 8px;">This section is fixed to N/A and cannot be edited — kept only to preserve the report format.</p>
+        <div class="locked-row"><span class="lk-label">Vehicle Make:</span><span class="lk-val">N/A</span></div>
+        <div class="locked-row"><span class="lk-label">Vehicle Model:</span><span class="lk-val">N/A</span></div>
+        <div class="locked-row"><span class="lk-label">Vehicle Plate:</span><span class="lk-val">N/A</span></div>
+        <div class="locked-row"><span class="lk-label">Vehicle Official Registry:</span><span class="lk-val">N/A</span></div>
+      </div>
+    </div>
+    <div class="col-right">
+      <button class="btn" style="background:var(--red);width:100%" id="genArrBtn">⚡ Generate Arrest Report</button>
+      <button class="btn btn-green" id="copyArrBtn" style="width:100%">📋 Copy Report</button>
+      <p class="section-label">Output</p>
+      <div class="output-box" id="arrOutput">Fill in the details and hit Generate.</div>
+    </div>
+  </section>
+
+  <!-- ── WARRANT TAB ──────────────────────────────────────────────────── -->
+  <section class="tab-panel" id="tab-warrant">
+    <div class="col-left" style="overflow-y:auto;">
+      <div class="notice">
+        <span>⚡ Charges from the Citation tab are shared automatically.</span>
+        <button class="btn btn-indigo btn-small" data-goto="citation">→ Add Charges</button>
+      </div>
+      <p class="section-label" style="color:var(--indigo)">Warrant Details</p>
+      <div class="card">
+        <label class="field-label">Involved Officer(s)</label>
+        <div class="field-wrap"><input id="wOfficers" placeholder="@Officer1, @Officer2"></div>
+        <label class="field-label">Department(s)</label>
+        <div class="field-wrap"><input id="wDept" placeholder="e.g. LCPD, BCSO"></div>
+        <label class="field-label">Suspect(s)</label>
+        <div class="field-wrap"><input id="wSuspects" placeholder="@Suspect1, @Suspect2"></div>
+      </div>
+    </div>
+    <div class="col-right">
+      <button class="btn btn-indigo" id="genWarBtn" style="width:100%">⚡ Generate Warrant Request</button>
+      <button class="btn btn-green" id="copyWarBtn" style="width:100%">📋 Copy Warrant</button>
+      <p class="section-label" style="color:var(--indigo)">Output</p>
+      <div class="output-box" id="warOutput">Fill in the details and hit Generate.</div>
+    </div>
+  </section>
+
+  <!-- ── PHRASES TAB ──────────────────────────────────────────────────── -->
+  <section class="tab-panel" id="tab-phrases">
+    <div style="display:flex;flex-direction:column;flex:1;min-width:0;">
+      <h2 style="margin:0 0 2px;font-size:18px;">Quick Copy Phrases</h2>
+      <p style="margin:0 0 12px;font-size:12px;color:var(--muted);">Click any row to instantly copy that phrase to your clipboard. Rows marked (auto) always reflect your current charges and settings.</p>
+      <div class="phr-columns" id="phraseColumns"></div>
+    </div>
+  </section>
+
+  <!-- ── DISPATCH TAB ─────────────────────────────────────────────────── -->
+  <section class="tab-panel" id="tab-dispatch">
+    <div style="display:flex;flex-direction:column;flex:1;min-width:0;">
+      <h2 style="margin:0 0 2px;font-size:18px;">🎙 Dispatch</h2>
+      <p style="margin:0 0 4px;font-size:12px;color:var(--muted);">Type a command, or tap the mic and speak it. Try "generate citation", "add reckless driving", or "help".</p>
+      <p class="mic-hint" id="micHint"></p>
+      <div class="dispatch-input-row" style="margin:10px 0;">
+        <input id="dispatchInput" placeholder="Type a command...">
+        <button class="mic-btn" id="micBtn" title="Speak a command">🎤</button>
+        <button class="btn btn-accent" id="dispatchSendBtn">Send ⏎</button>
+      </div>
+      <div class="dispatch-log" id="dispatchLog"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── SETTINGS MODAL ─────────────────────────────────────────────────── -->
+<div class="modal-overlay hidden" id="settingsModal">
+  <div class="modal-box">
+    <h2>⚙ Settings</h2>
+    <p class="modal-sub">These values auto-fill across the app and are saved in this browser.</p>
+    <div class="card">
+      <p class="section-label">Officer Defaults</p>
+      <label class="field-label">Officer Name</label>
+      <div class="field-wrap"><input id="setOfficerName"></div>
+      <label class="field-label">Badge Number</label>
+      <div class="field-wrap"><input id="setBadge"></div>
+      <label class="field-label">Callsign</label>
+      <div class="field-wrap"><input id="setCallsign"></div>
+      <label class="field-label">Division</label>
+      <div class="field-wrap"><input id="setDivision"></div>
+    </div>
+    <div class="card" style="margin-top:12px;">
+      <p class="section-label" style="color:var(--cyan)">Custom Greeting</p>
+      <p style="font-size:11px;color:var(--muted);margin:0 0 6px;">Used by the "Custom Greeting" quick phrase. Placeholders: {officer} {division}</p>
+      <div class="field-wrap"><input id="setGreeting"></div>
+    </div>
+    <button class="btn btn-accent" id="saveSettingsBtn" style="width:100%;margin-top:12px;">💾 Save Settings</button>
+
+    <p class="section-label" style="color:var(--indigo);margin-top:18px;">Appearance</p>
+    <div class="card">
+      <p style="font-size:11px;color:var(--muted);margin:0 0 10px;">Pick a color scheme. Applies instantly across the whole app.</p>
+      <div class="theme-row" id="themeRow"></div>
+    </div>
+
+    <p class="section-label" style="color:var(--orange);margin-top:18px;">Maintenance</p>
+    <div class="card">
+      <p style="font-size:11px;color:var(--muted);margin:0 0 8px;">Self-Heal checks this browser's saved data and repairs anything missing or corrupted.</p>
+      <button class="btn" style="background:var(--orange-d);color:var(--orange);width:100%" id="selfHealBtn">🩹 Run Self-Heal</button>
+      <div class="output-box" id="healOutput" style="margin-top:10px;min-height:60px;font-size:11px;">Click "Run Self-Heal" to check app data integrity.</div>
+    </div>
+    <div class="modal-close-row"><button class="btn btn-indigo" data-close="settingsModal">Close</button></div>
+  </div>
+</div>
+
+<!-- ── HISTORY MODAL ──────────────────────────────────────────────────── -->
+<div class="modal-overlay hidden" id="historyModal">
+  <div class="modal-box">
+    <h2>🕘 Report History</h2>
+    <div class="hist-stats" id="histStats"></div>
+    <div class="chart-wrap" id="histChart"></div>
+    <div style="display:flex;justify-content:flex-end;margin:10px 0;">
+      <button class="btn btn-red btn-small" id="clearHistBtn">🗑 Clear History</button>
+    </div>
+    <div class="hist-list" id="histList"></div>
+    <div class="modal-close-row"><button class="btn btn-indigo" data-close="historyModal">Close</button></div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+"use strict";
+
+/* ════════════════════════════════════════════════════════════════════
+   DATA
+   ════════════════════════════════════════════════════════════════════ */
+const THEME_ORDER = ["Midnight Blue","Slate","Emerald","Crimson","Cyberpunk","Sunset"];
+const THEME_SWATCH = {
+  "Midnight Blue":"#3b82f6", "Slate":"#71717a", "Emerald":"#10b981",
+  "Crimson":"#e11d48", "Cyberpunk":"#ec4899", "Sunset":"#f97316"
+};
+
+const DEFAULT_SETTINGS = {
+  officer_name:"", badge_number:"", callsign:"", division:"",
+  theme:"Midnight Blue",
+  greeting_template:"Hi, this is Officer {officer} with {division}, do you know why I am stopping you today?"
+};
+
+const QUICK_PHRASES = {
+  "🚔  Traffic Stop": [
+    ["✨ Custom Greeting","__DYNAMIC_GREETING__"],
+    ["License & Registration","Can I please see your license and registration?"],
+    ["Proof of Insurance","Do you have proof of insurance?"],
+    ["Reason for Stop","Do you know why I pulled you over today?"],
+    ["Step Out","Sir/Ma'am, please step out of the vehicle."],
+    ["Hands on Wheel","Keep your hands on the steering wheel please."],
+    ["Where headed?","Where are you headed today?"],
+    ["Speed aware?","Are you aware of how fast you were going?"],
+    ["Any weapons?","Do you have any weapons in the vehicle?"],
+    ["Any drugs?","Are there any drugs or contraband in the vehicle?"],
+    ["Being cited for","__DYNAMIC_CITED__"]
+  ],
+  "🚨  Arrest": [
+    ["Miranda Rights","You have the right to remain silent. Anything you say can and will be used against you in a court of law. You have the right to an attorney."],
+    ["Under Arrest","You are under arrest. Please do not resist."],
+    ["Hands Behind Back","Please put your hands behind your back."],
+    ["Do Not Resist","Stop resisting. Do not resist arrest."],
+    ["Detained","You are being detained. You are not free to leave."],
+    ["Cuffing","I am placing you in handcuffs for both our safety."],
+    ["Search Consent","Do I have your consent to search the vehicle?"]
+  ],
+  "📋  Citation": [
+    ["Sign Here","I need your signature here — signing is not an admission of guilt."],
+    ["Drive Safe","Please drive safely. Have a good day."],
+    ["License Suspended","Your license is suspended. You may not operate a vehicle."],
+    ["Vehicle Impounded","Your vehicle is being impounded. You may retrieve it at the impound lot."],
+    ["Warrant Check","I am running a warrant check. Please be patient."],
+    ["Run Plates","I am running your plates. One moment please."],
+    ["All Clear","All clear. You are free to go. Have a safe day."],
+    ["Stay in Vehicle","Please remain in your vehicle."]
+  ]
+};
+
+const PENAL_CODES = {
+  "Section 1: Traffic Violations": [
+    ["(1)01","Speeding 6-15 MPH Over the Speed Limit","$250","Citation"],
+    ["(1)02","Speeding 16-24 MPH Over the Speed Limit","$650","Citation"],
+    ["(1)03","Speeding 25+ MPH Over the Speed Limit","$1,250 + 30 Seconds of Jail Time","Misdemeanor"],
+    ["(1)04","Unsafe Speed for Conditions","$500","Citation"],
+    ["(1)05","Slowing/Stopping Without Reason","$300","Citation"],
+    ["(1)06","Impeding Traffic","$700","Citation"],
+    ["(1)07","Unsafe Lane Change","$300","Citation"],
+    ["(1)08","Unsafe Passing","$300","Citation"],
+    ["(1)09","Failure to Maintain Lanes","$300","Citation"],
+    ["(1)10","Driving into Oncoming Traffic","$1,250 + 60 Seconds of Jail Time","Misdemeanor"],
+    ["(1)11","Unsafe Following Distance","$250","Citation"],
+    ["(1)12","Unsafe Turn","$300","Citation"],
+    ["(1)13","Illegal U-Turn","$350","Citation"],
+    ["(1)14","Rolling a Stop Sign","$250","Citation"],
+    ["(1)15","Running a Red Light","$500","Citation"],
+    ["(1)16","Excessive Revving","$300","Citation"],
+    ["(1)17","Excessive Honking","$500","Citation"],
+    ["(1)18","Excessive Sounds/Music","$300","Citation"],
+    ["(1)19","Reckless Driving","$2,000 + 60 Seconds of Jail Time","Misdemeanor"],
+    ["(1)20","Burnout","$400","Citation"],
+    ["(1)21","Drifting on a Public Road","$500","Citation"],
+    ["(1)22","Drifting in a Parking Lot","$250","Citation"],
+    ["(1)23","Failure to Yield","$200","Citation"],
+    ["(1)24","Failure to Yield to Pedestrian","$250","Citation"],
+    ["(1)25","Failure to Yield to Emergency Vehicles","$500","Citation"],
+    ["(1)26","Failure to Follow Move Over Law","$550","Citation"],
+    ["(1)27","Failure to Obey Traffic Signal","$250","Citation"],
+    ["(1)28","Road Rage","$500","Misdemeanor"],
+    ["(1)29","Distracted Driving","$300","Citation"],
+    ["(1)30","Parking In a No Parking Zone","$150 + Impoundment of Vehicle","Citation"],
+    ["(1)31","Parking In a Handicap Parking Spot","$120","Citation"],
+    ["(1)32","Illegal Parking","$250","Citation"],
+    ["(1)33","Hit and Run","$500 + 60 Seconds of Jail Time","Misdemeanor"],
+    ["(1)34","Headlight Violation","$400","Citation"],
+    ["(1)35","Street Racing","$550","Misdemeanor"],
+    ["(1)36","Jaywalking","$400","Citation"],
+    ["(1)37","Blank Plate","$1,000","Misdemeanor"],
+    ["(1)38","Failure to Signal","$200","Citation"],
+    ["(1)39","Brake Checking","$250","Citation"],
+    ["(1)40","Improper Reversing","$750","Citation"],
+    ["(1)41","Unroadworthy Vehicle","$500 + Impoundment of Vehicle","Misdemeanor"]
+  ],
+  "Section 2: Documentation": [
+    ["(2)01","Driving on Learner's Permit Without Supervision","$500 + Impoundment of Vehicle","Misdemeanor"],
+    ["(2)02","Driving with No / Invalid Insurance","$750 + Impoundment of Vehicle","Misdemeanor"],
+    ["(2)03","Driving with No / Invalid Vehicle Registration","$500 + Impoundment of Vehicle","Misdemeanor"],
+    ["(2)04","Driving on a Suspended License","$1,000 + 60 Sec of Jail Time + Impoundment of the Vehicle","Felony"],
+    ["(2)05","Failure to Sign a Citation","$1,000 + 30 Seconds of Jail Time","Misdemeanor"],
+    ["(2)06","Operating Without a Valid License","$7,500 + 180 Seconds of Jail Time","Felony"]
+  ],
+  "Section 3: Crime Against Property": [
+    ["(3)01","Vandalism","$1,000 + 60 Seconds of Jail Time","Misdemeanor"],
+    ["(3)02","Arson","$1,250 + 100 Seconds of Jail Time","Felony"],
+    ["(3)03","Shoplifting","$300 + 30 Seconds of Jail Time","Misdemeanor"],
+    ["(3)04","Destruction of Government Property","$2,000 + 120 Seconds of Jail Time","Felony"],
+    ["(3)05","Destruction of Civilian Property","$1,000 + 30 Seconds of Jail Time","Misdemeanor"],
+    ["(3)06","Robbery","$1,000 + 90 Seconds of Jail Time","Felony"],
+    ["(3)07","Armed Robbery","$1,500 + 120 Seconds of Jail Time","Felony"],
+    ["(3)08","Burglary","$500 + 30 Seconds of Jail Time","Felony"],
+    ["(3)09","Armed Burglary","$1,000 + 60 Seconds of Jail Time","Felony"],
+    ["(3)10","Theft","$1,000 + 60 Seconds of Jail Time","Misdemeanor"],
+    ["(3)11","Grand Theft","$5,000 + 90 Seconds of Jail Time","Felony"],
+    ["(3)12","Grand Theft Auto","$10,000 + 120 Seconds of Jail Time","Felony"],
+    ["(3)13","Trespassing","$500 + 90 Seconds of Jail Time","Misdemeanor"],
+    ["(3)14","At Fault of Injury","$2,000 + 60 Seconds of Jail Time","Felony"],
+    ["(3)15","At Fault of Death","$10,000 + 200 Seconds of Jail Time","Felony"],
+    ["(3)16","Possession of Stolen Property","$1,000 + 60 Seconds of Jail Time","Felony"]
+  ],
+  "Section 4: Crimes Involving Deadly Weapons And Equipment": [
+    ["(4)01","Illegal / Unlicensed Weapon","$1,000 + 120 Seconds of Jail Time","Felony"],
+    ["(4)02","Recklessly Firing a Firearm","$2,250 + 200 Seconds of Jail Time","Felony"],
+    ["(4)03","Possesion of a Stolen Firearm","$1,500 + 90 Seconds of Jail Time","Felony"],
+    ["(4)04","Unlawful Selling of a Firearm","$1,500 + 200 Seconds of Jail Time","Misdemeanor"]
+  ],
+  "Section 5: Crime Against People and Peace": [
+    ["(5)01","Kidnapping","120 Seconds of Jail Time","Felony"],
+    ["(5)02","Child Endangerment","$10,000 + 60 Seconds of Jail Time","Felony"],
+    ["(5)03","Public Endangerment","$10,000 + 120 Seconds of Jail Time","Felony"],
+    ["(5)04","Criminal Threats","60 Seconds of Jail Time","Misdemeanor"],
+    ["(5)05","Encouraging to Riot","120 Seconds of Jail Time","Misdemeanor"],
+    ["(5)06","Disturbing the Peace","$750","Misdemeanor"],
+    ["(5)07","Assault","$1,000 + 60 Seconds of Jail Time","Felony"],
+    ["(5)08","Assault with a Deadly Weapon","$1,000 + 90 Seconds of Jail Time","Felony"],
+    ["(5)09","Assault on a Peace Officer","$1,000 + 120 Seconds of Jail Time","Felony"],
+    ["(5)10","Assault with a Motored Vehicle","$4,000 + 60 Seconds of Jail Time","Felony"],
+    ["(5)11","Attempted Murder","$1,000 + 60 Seconds of Jail Time","Felony"],
+    ["(5)12","Murder","$10,000 + 200 Seconds of Jail Time","Felony"],
+    ["(5)13","Stalking","$400 + 100 Seconds of Jail Time","Felony"],
+    ["(5)14","Disorderly Conduct","$1,500 + 90 Seconds of Jail Time","Misdemeanor"],
+    ["(5)15","Involuntary Manslaughter","$2,000 + 60 Seconds of Jail Time","Misdemeanor"],
+    ["(5)16","Manslaughter","$3,500 + 120 Seconds of Jail Time","Felony"],
+    ["(5)17","Battery","$1,500 + 60 Seconds of Jail Time","Misdemeanor"],
+    ["(5)18","Loitering","$1,250","Misdemeanor"],
+    ["(5)19","1st Degree Murder","$5,000 + 180 Seconds of Jail Time","Felony"],
+    ["(5)20","2nd Degree Murder","$4,500 + 120 Seconds of Jail Time","Felony"]
+  ],
+  "Section 6: Crime Against Justice": [
+    ["(6)01","Bribery","$7,500 + 60 Seconds of Jail Time","Felony"],
+    ["(6)02","Resisting Arrest","$1,250 + 30 Seconds of Jail Time","Felony"],
+    ["(6)03","Evading a Peace Officer","$450 + 100 Seconds of Jail Time","Misdemeanor"],
+    ["(6)04","Felony Evading a Peace Officer","$600 + 120 Seconds of Jail Time","Felony"],
+    ["(6)05","Impersonation of a Peace Officer","$1,250 + 60 Seconds of Jail Time","Felony"],
+    ["(6)06","Filing a False Police Report","$700 + 60 Seconds of Jail Time","Misdemeanor"],
+    ["(6)07","Avoiding / Evading a Lawful Traffic Stop","$750 + 50 Seconds of Jail Time","Felony"],
+    ["(6)08","Failure to Identify to a Peace Officer","$500 + 30 Seconds of Jail Time","Misdemeanor"],
+    ["(6)09","Failure to Comply with a Lawful Order","$500 + 60 Seconds of Jail Time","Misdemeanor"],
+    ["(6)10","Escape from Custody","$1,000 + 120 Seconds of Jail Time","Felony"],
+    ["(6)11","Prisoner Breakout","$10,000 + 90 Seconds of Jail Time","Felony"],
+    ["(6)12","Obstruction of Justice","$1,000 + 60 Seconds of Jail Time","Felony"],
+    ["(6)13","Cop Baiting","$2,500 + 120 Seconds of Jail Time","Misdemeanor"],
+    ["(6)14","Lying to a Law Enforcement Officer","$3,000 + 60 Seconds of Jail Time","Misdemeanor"],
+    ["(6)15","Aiding and Abetting","$2,500 + 60 Seconds of Jail Time","Misdemeanor"]
+  ]
+};
+
+const DISPATCH_COMMANDS = [
+  [["generate citation","make citation","create citation"], "cmdGenCitation", "Generate the current citation"],
+  [["generate arrest report","make arrest report","create arrest report","generate arrest"], "cmdGenArrest", "Generate the arrest report"],
+  [["generate warrant","make warrant","create warrant","generate warrant request"], "cmdGenWarrant", "Generate the warrant request"],
+  [["clear charges","clear citation","reset charges"], "cmdClear", "Clear all added charges"],
+  [["copy citation"], "cmdCopyCitation", "Copy the last generated citation"],
+  [["open settings","show settings"], "cmdOpenSettings", "Open the Settings window"],
+  [["open history","show history"], "cmdOpenHistory", "Open the History window"],
+  [["go to citation","switch to citation","citation tab"], "cmdTabCitation", "Switch to the Citation tab"],
+  [["go to arrest","switch to arrest","arrest tab"], "cmdTabArrest", "Switch to the Arrest tab"],
+  [["go to warrant","switch to warrant","warrant tab"], "cmdTabWarrant", "Switch to the Warrant tab"],
+  [["go to phrases","switch to phrases","phrases tab"], "cmdTabPhrases", "Switch to the Quick Phrases tab"],
+  [["help","commands","what can you do"], "cmdHelp", "List available commands"]
+];
+
+/* ════════════════════════════════════════════════════════════════════
+   STORAGE (localStorage — this browser's app data, no files touched)
+   ════════════════════════════════════════════════════════════════════ */
+const SETTINGS_KEY = "gvcr_settings_v1";
+const HISTORY_KEY  = "gvcr_history_v1";
+const HISTORY_LIMIT = 200;
+
+function loadSettings(){
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if(!raw) { saveSettings({...DEFAULT_SETTINGS}); return {...DEFAULT_SETTINGS}; }
+    const data = JSON.parse(raw);
+    if(typeof data !== "object" || data === null) throw new Error("bad");
+    return {...DEFAULT_SETTINGS, ...data};
+  } catch(e){
+    saveSettings({...DEFAULT_SETTINGS});
+    return {...DEFAULT_SETTINGS};
+  }
+}
+function saveSettings(s){
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); return true; }
+  catch(e){ return false; }
+}
+function loadHistory(){
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    if(!raw) { saveHistory([]); return []; }
+    const data = JSON.parse(raw);
+    if(!Array.isArray(data)) throw new Error("bad");
+    return data;
+  } catch(e){ saveHistory([]); return []; }
+}
+function saveHistory(items){
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(items)); return true; }
+  catch(e){ return false; }
+}
+function appendHistory(type, content){
+  let items = loadHistory();
+  items.push({type, content, timestamp: new Date().toLocaleString()});
+  if(items.length > HISTORY_LIMIT) items = items.slice(items.length - HISTORY_LIMIT);
+  saveHistory(items);
+}
+function selfHeal(){
+  const report = [];
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    const data = raw ? JSON.parse(raw) : null;
+    if(!data || typeof data !== "object") throw new Error("bad");
+    const missing = Object.keys(DEFAULT_SETTINGS).filter(k => !(k in data));
+    if(missing.length){
+      saveSettings({...DEFAULT_SETTINGS, ...data});
+      report.push(["warn", `Settings was missing keys [${missing.join(", ")}] — restored`]);
+    } else {
+      report.push(["ok", "Settings data OK"]);
+    }
+  } catch(e){
+    saveSettings({...DEFAULT_SETTINGS});
+    report.push(["warn", "Settings data was missing/corrupted — recreated with defaults"]);
+  }
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    const data = raw ? JSON.parse(raw) : null;
+    if(!Array.isArray(data)) throw new Error("bad");
+    report.push(["ok", `History data OK (${data.length} entries)`]);
+  } catch(e){
+    saveHistory([]);
+    report.push(["warn", "History data was missing/corrupted — reset to empty"]);
+  }
+  report.push(["ok", "Storage backend: browser localStorage (this device only)"]);
+  return report;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   STATE
+   ════════════════════════════════════════════════════════════════════ */
+const state = {
+  settings: loadSettings(),
+  charges: [],        // {section, code, ref, penalty, cls}
+  activeMode: "citation",
+  activeSection: Object.keys(PENAL_CODES)[0],
+  lastCit: "", lastArr: "", lastWar: "",
+  dynamicPhraseEls: []
+};
+
+/* ════════════════════════════════════════════════════════════════════
+   UTIL
+   ════════════════════════════════════════════════════════════════════ */
+function el(tag, attrs={}, ...children){
+  const e = document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){
+    if(k === "class") e.className = v;
+    else if(k === "text") e.textContent = v;
+    else if(k.startsWith("on") && typeof v === "function") e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v);
+  }
+  for(const c of children){
+    if(c == null) continue;
+    e.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  }
+  return e;
+}
+function qs(sel){ return document.querySelector(sel); }
+function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
+
+function parsePenalty(p){
+  let money=0, jail=0, imp=false;
+  const m = p.match(/\$([0-9,]+)/); if(m) money = parseInt(m[1].replace(/,/g,""),10);
+  const j = p.match(/(\d+)\s+Seconds? of Jail/i); if(j) jail = parseInt(j[1],10);
+  if(/impound/i.test(p)) imp = true;
+  return {money, jail, imp};
+}
+function buildPenalty(charges){
+  let tm=0, tj=0, ti=false;
+  for(const c of charges){ const {money,jail,imp} = parsePenalty(c.penalty); tm+=money; tj+=jail; if(imp) ti=true; }
+  const parts = [];
+  if(tm) parts.push("$"+tm.toLocaleString());
+  if(tj) parts.push(`${tj} Seconds of Jail Time`);
+  if(ti) parts.push("Vehicle Impoundment");
+  return parts.length ? parts.join(" + ") : "N/A";
+}
+function atPrefix(s){
+  if(!s) return s;
+  return s.split(",").map(p => "@"+p.trim().replace(/^@+/, "")).join(", ");
+}
+/* Simple Dice-coefficient style fuzzy ratio (0..1), good enough for short
+   command phrases — no external library needed. */
+function bigrams(s){
+  s = s.toLowerCase(); const out = [];
+  for(let i=0;i<s.length-1;i++) out.push(s.slice(i,i+2));
+  return out;
+}
+function fuzzyRatio(a, b){
+  const A = bigrams(a), B = bigrams(b);
+  if(!A.length || !B.length) return a === b ? 1 : 0;
+  const bCounts = {};
+  for(const bg of B) bCounts[bg] = (bCounts[bg]||0)+1;
+  let hits = 0;
+  for(const bg of A){ if(bCounts[bg] > 0){ hits++; bCounts[bg]--; } }
+  return (2*hits) / (A.length + B.length);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   SPLASH
+   ════════════════════════════════════════════════════════════════════ */
+function runSplash(cb){
+  const fill = qs("#splashFill"), status = qs("#splashStatus"), splash = qs("#splash");
+  const steps = [[25,"Loading penal codes..."], [60,"Building interface..."], [100,"Ready!"]];
+  let i = 0;
+  function next(){
+    if(i >= steps.length){ splash.classList.add("hide"); setTimeout(()=>splash.remove(), 450); cb(); return; }
+    const [pct,msg] = steps[i++];
+    fill.style.width = pct+"%"; status.textContent = msg;
+    setTimeout(next, 180);
+  }
+  next();
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   TOASTS
+   ════════════════════════════════════════════════════════════════════ */
+function toast(msg){
+  const c = qs("#toast-container");
+  const t = el("div", {class:"toast"}, "✓  "+msg);
+  c.appendChild(t);
+  requestAnimationFrame(()=> t.classList.add("show"));
+  setTimeout(()=>{ t.classList.remove("show"); setTimeout(()=>t.remove(), 300); }, 2200);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   THEME
+   ════════════════════════════════════════════════════════════════════ */
+function applyTheme(name){
+  document.documentElement.setAttribute("data-theme", name);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   NAV / TABS
+   ════════════════════════════════════════════════════════════════════ */
+const NAV_ITEMS = [
+  ["citation","🎫  Citation"], ["arrest","🚨  Arrest"], ["warrant","📋  Warrant"],
+  ["phrases","💬  Phrases"], ["dispatch","🎙  Dispatch"]
+];
+function buildNav(){
+  const nav = qs("#navTabs"); nav.innerHTML = "";
+  for(const [key,label] of NAV_ITEMS){
+    const b = el("button", {class:"nav-btn", "data-tab":key, text:label, onclick:()=>setMode(key)});
+    nav.appendChild(b);
+  }
+  updateNavActive();
+}
+function updateNavActive(){
+  qsa(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === state.activeMode));
+}
+function setMode(mode){
+  state.activeMode = mode;
+  qsa(".tab-panel").forEach(p => p.classList.remove("active"));
+  qs("#tab-"+mode).classList.add("active");
+  updateNavActive();
+}
+document.addEventListener("click", (e) => {
+  const g = e.target.closest("[data-goto]");
+  if(g) setMode(g.dataset.goto);
+});
+
+/* ════════════════════════════════════════════════════════════════════
+   SECTION STRIP + CODE LIST
+   ════════════════════════════════════════════════════════════════════ */
+function buildSecStrip(){
+  const strip = qs("#secStrip"); strip.innerHTML = "";
+  for(const sec of Object.keys(PENAL_CODES)){
+    const num = sec.split(":")[0].trim().split(" ").pop();
+    const title = sec.includes(":") ? sec.split(":").slice(1).join(":").trim() : sec;
+    const short = title.length > 16 ? title.slice(0,16)+"…" : title;
+    const b = el("button", {class:"sec-btn", text:`S${num}  ${short}`, onclick:()=>switchSection(sec)});
+    b.dataset.sec = sec;
+    strip.appendChild(b);
+  }
+}
+function switchSection(sec){
+  state.activeSection = sec;
+  qs("#searchInput").value = "";
+  qsa(".sec-btn").forEach(b => b.classList.toggle("active", b.dataset.sec === sec));
+  renderCodeList();
+}
+function renderCodeList(query){
+  query = (query !== undefined ? query : qs("#searchInput").value).trim().toLowerCase();
+  const wrap = qs("#codeListWrap"); wrap.innerHTML = "";
+  const sec = state.activeSection;
+  const codes = PENAL_CODES[sec] || [];
+
+  wrap.appendChild(el("div", {class:"code-header-row", text:sec}));
+  const colHeads = el("div", {class:"col-heads"});
+  ["CODE","OFFENSE","PENALTY","CLASS"].forEach(t => colHeads.appendChild(el("span",{text:t})));
+  wrap.appendChild(colHeads);
+
+  let shown = 0;
+  for(const [code, ref, penalty, cls] of codes){
+    const hay = (code+" "+ref+" "+penalty+" "+cls).toLowerCase();
+    if(query && !hay.includes(query)) continue;
+    shown++;
+    const row = el("div", {class:`code-row cls-${cls}`});
+    row.appendChild(el("div", {class:`badge cls-${cls}`, text:code}));
+    const refMatch = query && ref.toLowerCase().includes(query);
+    row.appendChild(el("div", {class:"ref-text"+(refMatch?" match":""), text:ref}));
+    row.appendChild(el("div", {class:"pen-text", text:penalty}));
+    row.appendChild(el("div", {class:`cls-pill cls-${cls}`, text:cls}));
+    const addBtn = el("button", {class:"add-btn", text:"+ Add"});
+    addBtn.addEventListener("click", (ev) => { ev.stopPropagation(); addCharge(sec,code,ref,penalty,cls); });
+    row.appendChild(addBtn);
+    row.addEventListener("click", () => addCharge(sec,code,ref,penalty,cls));
+    wrap.appendChild(row);
+  }
+  if(!shown){
+    wrap.appendChild(el("div", {class:"empty-note", text:"No results match your search."}));
+  }
+}
+qs("#searchInput").addEventListener("input", (e) => renderCodeList(e.target.value));
+
+/* ════════════════════════════════════════════════════════════════════
+   CHARGE MANAGEMENT
+   ════════════════════════════════════════════════════════════════════ */
+function addCharge(section, code, ref, penalty, cls){
+  state.charges.push({section, code, ref, penalty, cls});
+  refreshQueue(); refreshChargeSummary(); refreshDynamicPhrases();
+}
+function removeCharge(i){
+  state.charges.splice(i,1);
+  refreshQueue(); refreshChargeSummary(); refreshDynamicPhrases();
+}
+function clearCharges(){
+  state.charges = [];
+  refreshQueue(); refreshChargeSummary(); refreshDynamicPhrases();
+  writeOutput("citOutput", "Cleared. Add charges and hit Generate.");
+  state.lastCit = "";
+}
+function severityCounts(){
+  const counts = {Citation:0, Misdemeanor:0, Felony:0};
+  for(const c of state.charges) if(c.cls in counts) counts[c.cls]++;
+  return counts;
+}
+
+/* ── Reusable animated bar chart renderer (re-renders into a container) ── */
+function renderBarChart(containerId, items){
+  // items: [[label, colorVarName, value], ...]
+  const c = qs("#"+containerId);
+  const maxVal = Math.max(1, ...items.map(i => i[2]));
+  if(!c.dataset.built){
+    c.innerHTML = "";
+    for(const [label, colorVar] of items){
+      const row = el("div", {class:"chart-row"});
+      row.appendChild(el("span", {class:"clabel", text:label}));
+      const track = el("div", {class:"chart-track"});
+      const fill = el("div", {class:"chart-fill"});
+      fill.style.background = `var(${colorVar})`;
+      fill.dataset.label = label;
+      track.appendChild(fill);
+      row.appendChild(track);
+      const val = el("span", {class:"cval", text:"0"});
+      val.dataset.label = label;
+      row.appendChild(val);
+      c.appendChild(row);
+    }
+    c.dataset.built = "1";
+  }
+  for(const [label,, value] of items){
+    const fill = c.querySelector(`.chart-fill[data-label="${CSS.escape(label)}"]`);
+    const val = c.querySelector(`.cval[data-label="${CSS.escape(label)}"]`);
+    if(fill) fill.style.width = (value/maxVal*100)+"%";
+    if(val) val.textContent = value;
+  }
+}
+
+function refreshQueue(){
+  const q = qs("#citQueue"); q.innerHTML = "";
+  const n = state.charges.length;
+  qs("#chargeCountPill").textContent = `${n} charge${n!==1?"s":""}`;
+
+  const counts = severityCounts();
+  renderBarChart("citChart", [["Citation","--green",counts.Citation],["Misdemeanor","--orange",counts.Misdemeanor],["Felony","--red",counts.Felony]]);
+  renderBarChart("arrChart", [["Citation","--green",counts.Citation],["Misdemeanor","--orange",counts.Misdemeanor],["Felony","--red",counts.Felony]]);
+
+  if(!n){
+    q.appendChild(el("div", {class:"empty-note", text:"No charges added yet."}));
+    qs("#citTotals").textContent = "";
+    return;
+  }
+  let tm=0, tj=0, ti=false;
+  for(const c of state.charges){ const p = parsePenalty(c.penalty); tm+=p.money; tj+=p.jail; if(p.imp) ti=true; }
+  const parts = [];
+  if(tm) parts.push("$"+tm.toLocaleString());
+  if(tj) parts.push(tj+"s jail");
+  if(ti) parts.push("Impound");
+  qs("#citTotals").textContent = parts.join("  ·  ");
+
+  state.charges.forEach((c,i) => {
+    const row = el("div", {class:"queue-row"});
+    row.appendChild(el("div", {class:`badge cls-${c.cls}`, text:c.code}));
+    row.appendChild(el("div", {class:"ref-text", text:c.ref}));
+    const rm = el("button", {class:"rm-btn", text:"✕"});
+    rm.addEventListener("click", () => removeCharge(i));
+    row.appendChild(rm);
+    q.appendChild(row);
+  });
+}
+
+function refreshChargeSummary(){ /* placeholder kept for symmetry with dynamic phrase refresh chain */ }
+
+function writeOutput(id, text){ qs("#"+id).textContent = text; }
+
+/* ════════════════════════════════════════════════════════════════════
+   CITATION / ARREST / WARRANT GENERATION
+   ════════════════════════════════════════════════════════════════════ */
+
+function tally(arr){
+  const m = new Map();
+  arr.forEach(v => m.set(v, (m.get(v) || 0) + 1));
+  return [...m].map(([k, n]) => n > 1 ? `${k} x${n}` : k).join(", ");
+} 
+
+function genCitation(){
+  if(!state.charges.length){ alert("Add at least one charge first."); return; }
+  let prov = qs("#fProvider").value.trim() || "[Officer Name]";
+  let off  = qs("#fOffender").value.trim() || "[Offender Name]";
+  if(!prov.startsWith("@")) prov = "@"+prov;
+  if(!off.startsWith("@"))  off  = "@"+off;
+  const codes  = tally(state.charges.map(c=>c.code));
+const refs   = tally(state.charges.map(c=>c.ref));
+const pen    = buildPenalty(state.charges);
+const clss   = tally(state.charges.map(c=>c.cls));
+  state.lastCit = "Ticket Provider: " + prov + "\nSection: " + codes + "\nReference: " + refs + "\nPenalty: " + pen + "\nClassification: " + clss + "\nCount: " + state.charges.length + "\nOffender: " + off;
+  writeOutput("citOutput", state.lastCit);
+  copyToClipboard(state.lastCit);
+  appendHistory("citation", state.lastCit);
+  toast("Citation copied!");
+}
+function copyCitation(){ if(!state.lastCit) return genCitation(); copyToClipboard(state.lastCit); toast("Copied!"); }
+
+function genArrest(){
+  const officers = atPrefix(qs("#aOfficers").value.trim()) || "[Officer(s)]";
+  const depts    = qs("#aDept").value.trim() || "[Department(s)]";
+  const suspects = atPrefix(qs("#aSuspects").value.trim()) || "[Suspect(s)]";
+  let codes="[No charges]", refs="[No charges]", clss="[No charges]", pen="[No charges]", count=0;
+  if(state.charges.length){
+ const codes  = tally(state.charges.map(c=>c.code));
+const refs   = tally(state.charges.map(c=>c.ref));
+const pen    = buildPenalty(state.charges);
+const clss   = tally(state.charges.map(c=>c.cls));
+    count = state.charges.length;
+  }
+  state.lastArr = `Involved Officer(s): ${officers}\nDepartment(s): ${depts}\nSuspect(s): ${suspects}\n\n----------\n\nPenal Code Section: ${codes}\nReference(s): ${refs}\nPenaltie(s): ${pen}\nClassification(s): ${clss}\nCount: ${count}\n\n----------\n\nVehicle Make: N/A\nVehicle Model: N/A\nVehicle Plate: N/A\nVehicle Official Registry: N/A\n\n*Attached mugshot(s);*`;
+  writeOutput("arrOutput", state.lastArr);
+  copyToClipboard(state.lastArr);
+  appendHistory("arrest", state.lastArr);
+  toast("Arrest report copied!");
+}
+function copyArrest(){ if(!state.lastArr) return genArrest(); copyToClipboard(state.lastArr); toast("Copied!"); }
+
+function genWarrant(){
+  const officers = atPrefix(qs("#wOfficers").value.trim()) || "[Officer(s)]";
+  const depts    = qs("#wDept").value.trim() || "[Department(s)]";
+  const suspects = atPrefix(qs("#wSuspects").value.trim()) || "[Suspect(s)]";
+  let codes="[No charges]", refs="[No charges]", clss="[No charges]", pen="[No charges]", count=0;
+  if(state.charges.length){
+   codes  = tally(state.charges.map(c=>c.code));
+refs   = tally(state.charges.map(c=>c.ref));
+clss   = tally(state.charges.map(c=>c.cls));
+pen    = buildPenalty(state.charges);
+count  = state.charges.length;
+  }
+  const dash = "———————————————";
+  state.lastWar = "Warrant Request #000\n\nInvolved Officer(s): " + officers + "\nDepartment(s): " + depts + "\nSuspect(s): " + suspects + "\n\n" + dash + "\n\nPenal Codes: " + codes + "\nReferences: " + refs + "\nPenalties: " + pen + "\nClassifications: " + clss + "\nCount: " + count + "\n\n" + dash + "\n\nDetailed Summary: [Enter summary here]\nEvidence: [Enter evidence here]";
+  writeOutput("warOutput", state.lastWar);
+  copyToClipboard(state.lastWar);
+  appendHistory("warrant", state.lastWar);
+  toast("Warrant request copied!");
+}
+
+function copyToClipboard(text){
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).catch(()=>fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); } catch(e){}
+  document.body.removeChild(ta);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   QUICK PHRASES
+   ════════════════════════════════════════════════════════════════════ */
+function computeDynamicPhrase(key){
+  if(key === "__DYNAMIC_CITED__"){
+    if(!state.charges.length) return "You are being cited for the following violation(s):\n  (no charges added yet)";
+    const lines = ["You are being cited for the following violation(s):"];
+    for(const c of state.charges) lines.push(`  • ${c.code} ${c.ref} — ${c.penalty}`);
+    return lines.join("\n");
+  }
+  if(key === "__DYNAMIC_GREETING__"){
+    const officer = state.settings.officer_name?.trim() || "[Officer Name]";
+    const division = state.settings.division?.trim() || "[Department]";
+    const template = state.settings.greeting_template || DEFAULT_SETTINGS.greeting_template;
+    try { return template.replace(/\{officer\}/g, officer).replace(/\{division\}/g, division); }
+    catch(e){ return template; }
+  }
+  return key;
+}
+function refreshDynamicPhrases(){
+  for(const {marker, el:node} of state.dynamicPhraseEls){
+    node.textContent = computeDynamicPhrase(marker);
+  }
+}
+const CAT_COLORS = ["--accent","--red","--indigo","--cyan"];
+function buildPhrasesTab(){
+  const wrap = qs("#phraseColumns"); wrap.innerHTML = "";
+  state.dynamicPhraseEls = [];
+  const cols = [el("div",{class:"phr-col"}), el("div",{class:"phr-col"})];
+  wrap.appendChild(cols[0]); wrap.appendChild(cols[1]);
+
+  Object.entries(QUICK_PHRASES).forEach(([cat, phrases], idx) => {
+    const col = cols[idx % 2];
+    const colorVar = CAT_COLORS[idx % CAT_COLORS.length];
+    const hdr = el("div", {class:"phr-cat-header"});
+    const stripe = el("span", {class:"stripe"}); stripe.style.background = `var(${colorVar})`;
+    hdr.appendChild(stripe); hdr.appendChild(el("span",{text:cat}));
+    col.appendChild(hdr);
+
+    for(const [label, phrase] of phrases){
+      const isDynamic = typeof phrase === "string" && phrase.startsWith("__DYNAMIC_");
+      const row = el("div", {class:"phr-row"});
+      row.style.borderLeftColor = "transparent";
+      row.appendChild(el("div", {class:"phr-label"+(isDynamic?" dyn":""), text: isDynamic ? label+"  (auto)" : label}));
+      const textEl = el("div", {class:"phr-text", text: isDynamic ? computeDynamicPhrase(phrase) : phrase});
+      row.appendChild(textEl);
+      if(isDynamic) state.dynamicPhraseEls.push({marker: phrase, el: textEl});
+      const copiedEl = el("div", {class:"phr-copied", text:""});
+      row.appendChild(copiedEl);
+
+      row.addEventListener("mouseenter", () => { row.style.borderLeftColor = `var(${colorVar})`; });
+      row.addEventListener("mouseleave", () => { row.style.borderLeftColor = "transparent"; });
+      row.addEventListener("click", () => {
+        const finalText = isDynamic ? computeDynamicPhrase(phrase) : phrase;
+        copyToClipboard(finalText);
+        copiedEl.textContent = "✓ Copied";
+        setTimeout(()=> copiedEl.textContent = "", 1400);
+      });
+      col.appendChild(row);
+    }
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   DISPATCH
+   ════════════════════════════════════════════════════════════════════ */
+function dispatchLog(text, cls){
+  const log = qs("#dispatchLog");
+  const line = el("div", {class:cls}, text);
+  log.appendChild(line);
+  log.appendChild(document.createElement("br"));
+  log.scrollTop = log.scrollHeight;
+}
+function dispatchEcho(text){ dispatchLog("> "+text, "echo"); }
+function dispatchReply(text){ dispatchLog(text, "reply"); toast(text.split("\n")[0]); }
+
+function findOffense(query){
+  query = query.trim().toLowerCase();
+  if(!query) return null;
+  let best=null, bestScore=0;
+  for(const [sec, entries] of Object.entries(PENAL_CODES)){
+    for(const [code, ref, pen, cls] of entries){
+      const rl = ref.toLowerCase();
+      let score = fuzzyRatio(query, rl);
+      if(rl.includes(query)) score = Math.max(score, 0.85);
+      if(score > bestScore){ bestScore = score; best = {sec, code, ref, pen, cls}; }
+    }
+  }
+  return bestScore >= 0.5 ? best : null;
+}
+
+function runDispatchCommand(raw){
+  raw = raw.trim();
+  if(!raw) return;
+  dispatchEcho(raw);
+  const low = raw.toLowerCase();
+
+  if(low.startsWith("add ")){
+    const match = findOffense(low.slice(4));
+    if(match){
+      addCharge(match.sec, match.code, match.ref, match.pen, match.cls);
+      dispatchReply(`10-4. Added ${match.code} — ${match.ref}.`);
+    } else {
+      dispatchReply(`Copy that, but no offense matched "${raw.slice(4).trim()}". Try "help".`);
+    }
+    return;
+  }
+
+  let bestScore=0, bestHandler=null;
+  for(const [phrases, handler] of DISPATCH_COMMANDS){
+    for(const p of phrases){
+      let score = fuzzyRatio(low, p);
+      if(low.includes(p)) score = Math.max(score, 0.9);
+      if(score > bestScore){ bestScore = score; bestHandler = handler; }
+    }
+  }
+  if(bestHandler && bestScore >= 0.55){
+    DISPATCH_HANDLERS[bestHandler]();
+    return;
+  }
+  dispatchReply('Copy that? Command not recognized. Type "help" for a list.');
+}
+
+const DISPATCH_HANDLERS = {
+  cmdGenCitation(){ setMode("citation"); genCitation(); dispatchReply("10-4. Citation generated and copied."); },
+  cmdGenArrest(){ setMode("arrest"); genArrest(); dispatchReply("10-4. Arrest report generated and copied."); },
+  cmdGenWarrant(){ setMode("warrant"); genWarrant(); dispatchReply("10-4. Warrant request generated and copied."); },
+  cmdClear(){ clearCharges(); dispatchReply("10-4. Charges cleared."); },
+  cmdCopyCitation(){ copyCitation(); dispatchReply("10-4. Citation copied."); },
+  cmdOpenSettings(){ openModal("settingsModal"); dispatchReply("10-4. Opening Settings."); },
+  cmdOpenHistory(){ openModal("historyModal"); buildHistoryModal(); dispatchReply("10-4. Opening History."); },
+  cmdTabCitation(){ setMode("citation"); dispatchReply("10-4. Switched to Citation tab."); },
+  cmdTabArrest(){ setMode("arrest"); dispatchReply("10-4. Switched to Arrest tab."); },
+  cmdTabWarrant(){ setMode("warrant"); dispatchReply("10-4. Switched to Warrant tab."); },
+  cmdTabPhrases(){ setMode("phrases"); dispatchReply("10-4. Switched to Phrases tab."); },
+  cmdHelp(){
+    const lines = ["Available commands:"];
+    for(const [phrases,,desc] of DISPATCH_COMMANDS) lines.push(`  • ${phrases[0]}  —  ${desc}`);
+    lines.push('  • add <offense name>  —  Add a charge by name (e.g. "add reckless driving")');
+    dispatchLog(lines.join("\n"), "reply");
+  }
+};
+
+/* ── Real browser voice input (Web Speech API) — click mic, speak, auto-submits ── */
+function setupVoice(){
+  const micBtn = qs("#micBtn"), hint = qs("#micHint");
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if(!window.isSecureContext){
+    hint.textContent = "🎤 Voice input needs this page served over https:// or http://localhost — opening the file directly (file://) won't get mic permission in most browsers.";
+    micBtn.disabled = true; micBtn.style.opacity = 0.4; micBtn.style.cursor = "not-allowed";
+    return;
+  }
+  if(!SR){
+    hint.textContent = "🎤 Voice input isn't supported in this browser — try Chrome or Edge.";
+    micBtn.disabled = true; micBtn.style.opacity = 0.4; micBtn.style.cursor = "not-allowed";
+    return;
+  }
+  hint.textContent = "🎤 Click the mic, speak your command, and it auto-submits when you stop talking.";
+  const recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = "en-US";
+
+  recognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    qs("#dispatchInput").value = text;
+    runDispatchCommand(text);
+    qs("#dispatchInput").value = "";
+  };
+  recognition.onerror = (e) => {
+    micBtn.classList.remove("listening");
+    dispatchReply("Copy that? Mic error: "+(e.error||"unknown")+".");
+  };
+  recognition.onend = () => micBtn.classList.remove("listening");
+
+  micBtn.addEventListener("click", () => {
+    try { recognition.start(); micBtn.classList.add("listening"); }
+    catch(e){ /* already listening */ }
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   SETTINGS MODAL
+   ════════════════════════════════════════════════════════════════════ */
+function openModal(id){ qs("#"+id).classList.remove("hidden"); }
+function closeModal(id){ qs("#"+id).classList.add("hidden"); }
+document.addEventListener("click", (e) => {
+  const c = e.target.closest("[data-close]");
+  if(c) closeModal(c.dataset.close);
+  if(e.target.classList && e.target.classList.contains("modal-overlay")) e.target.classList.add("hidden");
+});
+
+function buildThemeRow(){
+  const row = qs("#themeRow"); row.innerHTML = "";
+  for(const name of THEME_ORDER){
+    const item = el("div", {class:"theme-item"});
+    const sw = el("div", {class:"theme-swatch"+(state.settings.theme===name?" active":"")});
+    sw.style.background = THEME_SWATCH[name];
+    sw.addEventListener("click", () => pickTheme(name));
+    item.appendChild(sw);
+    item.appendChild(el("span", {text:name}));
+    row.appendChild(item);
+  }
+}
+function pickTheme(name){
+  state.settings.theme = name;
+  saveSettings(state.settings);
+  applyTheme(name);
+  buildThemeRow();
+  toast(`Theme set to ${name}!`);
+}
+function openSettingsModal(){
+  qs("#setOfficerName").value = state.settings.officer_name || "";
+  qs("#setBadge").value = state.settings.badge_number || "";
+  qs("#setCallsign").value = state.settings.callsign || "";
+  qs("#setDivision").value = state.settings.division || "";
+  qs("#setGreeting").value = state.settings.greeting_template || "";
+  qs("#setGreeting").placeholder = DEFAULT_SETTINGS.greeting_template;
+  buildThemeRow();
+  qs("#healOutput").textContent = 'Click "Run Self-Heal" to check app data integrity.';
+  openModal("settingsModal");
+}
+function saveSettingsFromModal(){
+  state.settings.officer_name = qs("#setOfficerName").value.trim();
+  state.settings.badge_number = qs("#setBadge").value.trim();
+  state.settings.callsign = qs("#setCallsign").value.trim();
+  state.settings.division = qs("#setDivision").value.trim();
+  state.settings.greeting_template = qs("#setGreeting").value.trim();
+  saveSettings(state.settings);
+  applyOfficerDefaults();
+  refreshDynamicPhrases();
+  toast("Settings saved!");
+}
+function applyOfficerDefaults(){
+  const name = state.settings.officer_name?.trim();
+  if(!name) return;
+  const field = qs("#fProvider");
+  if(!field.value.trim() || field.dataset.lastApplied === field.value){
+    field.value = name;
+    field.dataset.lastApplied = name;
+  }
+}
+function runSelfHealUI(){
+  const report = selfHeal();
+  const icons = {ok:"✓", warn:"⚠", fail:"✗"};
+  qs("#healOutput").textContent = report.map(([s,m]) => `${icons[s]||"•"}  ${m}`).join("\n");
+  toast("Self-heal complete!");
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   HISTORY MODAL
+   ════════════════════════════════════════════════════════════════════ */
+function animateCount(elm, target, steps=12, delay=18){
+  let i = 0;
+  function step(){
+    elm.textContent = Math.round(target * (i/steps));
+    if(i++ < steps) setTimeout(step, delay);
+    else elm.textContent = target;
+  }
+  step();
+}
+function buildHistoryModal(){
+  const items = loadHistory();
+  const counts = {Citations:0, Arrests:0, Warrants:0};
+  const typeMap = {citation:"Citations", arrest:"Arrests", warrant:"Warrants"};
+  for(const it of items){ const k = typeMap[it.type]; if(k) counts[k]++; }
+
+  const statsWrap = qs("#histStats"); statsWrap.innerHTML = "";
+  const statColors = {Citations:"var(--green)", Arrests:"var(--red)", Warrants:"var(--indigo)"};
+  for(const label of ["Citations","Arrests","Warrants"]){
+    const card = el("div", {class:"hist-stat"});
+    const num = el("div", {class:"num", text:"0"}); num.style.color = statColors[label];
+    card.appendChild(num);
+    card.appendChild(el("div", {class:"lbl", text:label}));
+    statsWrap.appendChild(card);
+    animateCount(num, counts[label]);
+  }
+
+  renderBarChart("histChart", [["Citations","--green",counts.Citations],["Arrests","--red",counts.Arrests],["Warrants","--indigo",counts.Warrants]]);
+  qs("#histChart").dataset.built = ""; // force rebuild each open since labels differ from severity chart
+  renderBarChart("histChart", [["Citations","--green",counts.Citations],["Arrests","--red",counts.Arrests],["Warrants","--indigo",counts.Warrants]]);
+
+  const list = qs("#histList"); list.innerHTML = "";
+  if(!items.length){
+    list.appendChild(el("div", {class:"empty-note", text:"No history yet — generate a citation, arrest report, or warrant to see it here."}));
+  } else {
+    const typeColors = {citation:"var(--green)", arrest:"var(--red)", warrant:"var(--indigo)"};
+    [...items].reverse().forEach(item => {
+      const row = el("div", {class:"hist-item"});
+      const top = el("div", {class:"htop"});
+      const tag = el("span", {class:"htag", text:(item.type||"?").toUpperCase()});
+      tag.style.background = typeColors[item.type] || "var(--muted)";
+      tag.style.color = "var(--bg)";
+      top.appendChild(tag);
+      top.appendChild(el("span", {text:item.timestamp||"", style:"color:var(--muted)"}));
+      row.appendChild(top);
+      row.appendChild(el("div", {class:"hprev", text:(item.content||"").split("\n")[0].slice(0,70)}));
+      row.addEventListener("click", () => { copyToClipboard(item.content||""); toast("Copied from history!"); });
+      list.appendChild(row);
+    });
+  }
+}
+function clearHistoryUI(){
+  if(confirm("Delete all saved history? This cannot be undone.")){
+    saveHistory([]);
+    buildHistoryModal();
+    toast("History cleared.");
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   WIRE UP EVENTS
+   ════════════════════════════════════════════════════════════════════ */
+function wireEvents(){
+  qs("#clearBtn").addEventListener("click", clearCharges);
+  qs("#genCitBtn").addEventListener("click", genCitation);
+  qs("#copyCitBtn").addEventListener("click", copyCitation);
+  qs("#genArrBtn").addEventListener("click", genArrest);
+  qs("#copyArrBtn").addEventListener("click", copyArrest);
+  qs("#genWarBtn").addEventListener("click", genWarrant);
+  qs("#copyWarBtn").addEventListener("click", genWarrant);
+
+  qs("#settingsBtn").addEventListener("click", openSettingsModal);
+  qs("#saveSettingsBtn").addEventListener("click", saveSettingsFromModal);
+  qs("#selfHealBtn").addEventListener("click", runSelfHealUI);
+
+  qs("#historyBtn").addEventListener("click", () => { buildHistoryModal(); openModal("historyModal"); });
+  qs("#clearHistBtn").addEventListener("click", clearHistoryUI);
+
+  qs("#dispatchSendBtn").addEventListener("click", () => {
+    const v = qs("#dispatchInput").value; qs("#dispatchInput").value = "";
+    runDispatchCommand(v);
+  });
+  qs("#dispatchInput").addEventListener("keydown", (e) => {
+    if(e.key === "Enter"){ qs("#dispatchSendBtn").click(); }
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════════════════════════════ */
+function init(){
+  applyTheme(state.settings.theme || "Midnight Blue");
+  buildNav();
+  buildSecStrip();
+  switchSection(state.activeSection);
+  buildPhrasesTab();
+  wireEvents();
+  setupVoice();
+  refreshQueue();
+  applyOfficerDefaults();
+  dispatchReply('Dispatch ready. Try "generate citation", "add reckless driving", "open settings", or "help".');
+}
+
+runSplash(init);
+</script>
+</body>
+</html>
