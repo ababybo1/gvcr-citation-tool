@@ -598,11 +598,12 @@ const PENAL_CODES = {
     ["(1)38","Failure to Signal","$200","Citation"],
     ["(1)39","Brake Checking","$250","Citation"],
     ["(1)40","Improper Reversing","$750","Citation"],
-    ["(1)41","Unroadworthy Vehicle","$500 + Impoundment of Vehicle","Misdemeanor"]
+    ["(1)41","Unroadworthy Vehicle","$500 + Impoundment of Vehicle","Misdemeanor"],
+    ["(1)42","Failure to Stop for School Bus With Flashing Lights","$750","Citation"]
   ],
   "Section 2: Documentation": [
     ["(2)01","Driving on Learner's Permit Without Supervision","$500 + Impoundment of Vehicle","Misdemeanor"],
-    ["(2)02","Driving with No / Invalid Insurance","$750 + Impoundment of Vehicle","Misdemeanor"],
+    ["(2)02","Driving with No / Invalid Vehicle Insurance","$750 + Impoundment of Vehicle","Misdemeanor"],
     ["(2)03","Driving with No / Invalid Vehicle Registration","$500 + Impoundment of Vehicle","Misdemeanor"],
     ["(2)04","Driving on a Suspended License","$1,000 + 60 Sec of Jail Time + Impoundment of the Vehicle","Felony"],
     ["(2)05","Failure to Sign a Citation","$1,000 + 30 Seconds of Jail Time","Misdemeanor"],
@@ -644,15 +645,16 @@ const PENAL_CODES = {
     ["(5)09","Assault on a Peace Officer","$1,000 + 120 Seconds of Jail Time","Felony"],
     ["(5)10","Assault with a Motored Vehicle","$4,000 + 60 Seconds of Jail Time","Felony"],
     ["(5)11","Attempted Murder","$1,000 + 60 Seconds of Jail Time","Felony"],
-    ["(5)12","Murder","$10,000 + 200 Seconds of Jail Time","Felony"],
-    ["(5)13","Stalking","$400 + 100 Seconds of Jail Time","Felony"],
-    ["(5)14","Disorderly Conduct","$1,500 + 90 Seconds of Jail Time","Misdemeanor"],
-    ["(5)15","Involuntary Manslaughter","$2,000 + 60 Seconds of Jail Time","Misdemeanor"],
-    ["(5)16","Manslaughter","$3,500 + 120 Seconds of Jail Time","Felony"],
-    ["(5)17","Battery","$1,500 + 60 Seconds of Jail Time","Misdemeanor"],
-    ["(5)18","Loitering","$1,250","Misdemeanor"],
-    ["(5)19","1st Degree Murder","$5,000 + 180 Seconds of Jail Time","Felony"],
-    ["(5)20","2nd Degree Murder","$4,500 + 120 Seconds of Jail Time","Felony"]
+    ["(5)12","1st Degree Intentional Homicide","$7,500 + 200 Seconds of Jail Time","Felony"],
+    ["(5)13","2nd Degree Intentional Homicide","$5,000 + 180 Seconds of Jail Time","Felony"],
+    ["(5)14","1st Degree Reckless Homicide","$3,500 + 150 Seconds of Jail Time","Felony"],
+    ["(5)15","2nd Degree Reckless Homicide","$2,500 + 120 Seconds of Jail Time","Felony"],
+    ["(5)16","Negligent Homicide","$5,000 + 180 Seconds of Jail Time","Felony"],
+    ["(5)17","Felony Murder","$10,000 + 200 Seconds of Jail Time","Felony"],
+    ["(5)18","Stalking","$400 + 100 Seconds of Jail Time","Felony"],
+    ["(5)19","Disorderly Conduct","$1,500 + 90 Seconds of Jail Time","Misdemeanor"],
+    ["(5)20","Battery","$1,500 + 60 Seconds of Jail Time","Misdemeanor"],
+    ["(5)21","Loitering","$1,250","Misdemeanor"]
   ],
   "Section 6: Crime Against Justice": [
     ["(6)01","Bribery","$7,500 + 60 Seconds of Jail Time","Felony"],
@@ -672,6 +674,50 @@ const PENAL_CODES = {
     ["(6)15","Aiding and Abetting","$2,500 + 60 Seconds of Jail Time","Misdemeanor"]
   ]
 };
+
+const CODE_NOTES = {
+  "(5)07": "An intentional act that creates a reasonable fear or apprehension of immediate harmful or offensive contact.",
+  "(5)11": "The attempt to kill someone with a specific intent to cause their death, but failing to complete the act because of an outside interference or factor.",
+  "(5)12": "Causing the death of another person with intent.",
+  "(5)13": "Intentional killing caused by circumstances like adequate provocation or self-defense; equivalent to voluntary manslaughter.",
+  "(5)14": "Causing death with utter disregard for human life; equivalent to involuntary manslaughter.",
+  "(5)15": "Causing death through reckless conduct; equivalent to involuntary manslaughter.",
+  "(5)16": "Negligent control of a vicious animal, negligent use of a weapon/firearm, and/or intoxicated or reckless driving (such as causing death by intoxicated use of a vehicle).",
+  "(5)17": "Causing a death while committing certain dangerous underlying felonies, such as battery, assault, kidnapping, arson, or burglary.",
+  "(5)20": "The intentional and unlawful use of force, violence, or unwanted physical contact against another person."
+};
+
+function getCodeNote(code){
+  return CODE_NOTES[code] || "";
+}
+
+function injectCodeNotes(){
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const hits = [];
+  while(walker.nextNode()){
+    const node = walker.currentNode;
+    const t = node.textContent.trim();
+    if(CODE_NOTES[t] && node.parentElement) hits.push(node.parentElement);
+  }
+  hits.forEach(el => {
+    const row = el.closest("tr, li, .charge-item, .charge") || el.parentElement;
+    if(!row || row.dataset.noteAdded) return;
+    row.dataset.noteAdded = "1";
+    const note = document.createElement("div");
+    note.className = "code-note";
+    note.textContent = "↳ " + CODE_NOTES[el.textContent.trim()];
+    note.style.cssText = "font-size:12px;color:#94a3b8;font-style:italic;padding:4px 10px 8px;white-space:normal;line-height:1.4;";
+    row.insertAdjacentElement("afterend", note);
+  });
+}
+
+// Run now, and again whenever the list re-renders (search, adding charges, etc.)
+injectCodeNotes();
+let noteTimer = null;
+new MutationObserver(() => {
+  clearTimeout(noteTimer);
+  noteTimer = setTimeout(injectCodeNotes, 50);
+}).observe(document.body, { childList: true, subtree: true });
 
 const DISPATCH_COMMANDS = [
   [["generate citation","make citation","create citation"], "cmdGenCitation", "Generate the current citation"],
