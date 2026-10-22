@@ -1522,6 +1522,30 @@ function init(){
 }
 
 runSplash(init);
+// Desktop-only notice for phones/tablets
+(function(){
+  var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) 
+                 || (window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+  if (!isMobile || localStorage.getItem("gvcr_pc_notice_dismissed")) return;
+
+  var overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:#05070d;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;";
+  overlay.innerHTML =
+    '<div style="max-width:360px;text-align:center;color:#fff">' +
+      '<div style="font-size:60px;margin-bottom:16px">🖥️</div>' +
+      '<h2 style="margin:0 0 12px;font-size:22px">Best on Desktop</h2>' +
+      '<p style="color:#94a3b8;line-height:1.6;margin:0 0 24px;font-size:15px">' +
+        'The GVCR Citation Tool is designed for PC. Some features may not work properly on mobile devices.' +
+      '</p>' +
+      '<button id="pcNoticeContinue" style="background:#3b82f6;color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:15px;cursor:pointer">Continue Anyway</button>' +
+    '</div>';
+  document.body.appendChild(overlay);
+
+  document.getElementById("pcNoticeContinue").addEventListener("click", function(){
+    localStorage.setItem("gvcr_pc_notice_dismissed", "1");
+    overlay.remove();
+  });
+})();
 </script>
 </body>
 </html>
