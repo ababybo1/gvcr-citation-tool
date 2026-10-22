@@ -84,6 +84,54 @@
   button { font-family:inherit; cursor:pointer; border:none; }
   input, button { outline:none; }
 
+/* ===== RESPONSIVE: PHONES, TABLETS, LANDSCAPE ===== */
+
+/* Base mobile-safe rules (all screens under 1024px wide) */
+@media (max-width: 1024px) {
+  html, body { -webkit-text-size-adjust: 100%; }
+  body { overflow-x: hidden; }
+
+  button, .btn, select, input, textarea { min-height: 40px; touch-action: manipulation; }
+  button, .btn { -webkit-tap-highlight-color: transparent; }
+
+  #topbar { flex-wrap: wrap; gap: 8px; height: auto !important; padding: 8px 10px; }
+  #topbar h1, #topbar .subtitle { white-space: normal; }
+
+  #tabs, .tabs, .nav { overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  #tabs::-webkit-scrollbar, .tabs::-webkit-scrollbar { display: none; }
+
+  .grid, .layout, .main, .panels { grid-template-columns: 1fr !important; flex-direction: column !important; }
+  .panel, .card { width: 100% !important; max-width: 100% !important; }
+
+  pre, .output, #citOutput, #arrOutput, #warOutput { white-space: pre-wrap !important; word-break: break-word; }
+}
+
+/* Tablets and small laptops (up to 900px) */
+@media (max-width: 900px) {
+  body { font-size: 15px; }
+}
+
+/* Phones, portrait and landscape (up to 600px wide, or short landscape screens) */
+@media (max-width: 600px), (max-height: 500px) and (orientation: landscape) {
+  body { font-size: 15px; }
+  #topbar .logo { width: 32px !important; height: 32px !important; }
+  #countBadge, #search { width: 100% !important; }
+  .charge-item { flex-wrap: wrap; gap: 6px; }
+  .code-note { font-size: 11px; }
+
+  .modal, .modal-box, .modal-content { width: 100vw !important; max-width: 100vw !important; height: 100dvh !important; max-height: 100dvh !important; border-radius: 0 !important; overflow-y: auto; }
+
+  #dispatchInput { font-size: 16px; } /* 16px stops iPhone zooming in on focus */
+
+  .splash-box { width: 90vw !important; max-width: 90vw !important; }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  body { font-size: 14px; }
+  button { font-size: 13px; padding: 6px 8px; }
+}
+
   /* ── Splash ─────────────────────────────────────────────────────────── */
   #splash {
     position:fixed; inset:0; background:var(--bg); z-index:9999;
