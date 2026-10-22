@@ -8,8 +8,8 @@ The code is open source if you want to verify its security and privacy.
 
 To be implemented by executives.
 
-Usage for things outside of GVCR purposes must first be contacted to me (ababyboi, Discord) before waiting for approval and should be used with credit if approved.
+Usage for things outside of GVCR purposes must first be contacted to me (ababyboi, Discord) before waiting for approval.
 
-All Rights Reserved,
+Licensed under MIT. Attribution required: Credit x3alpy & ababyboi if you fork or modify.
 
 GVCR P/S
