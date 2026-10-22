@@ -301,6 +301,120 @@
   .toast.show { opacity:1; transform:translateY(0); }
 
   .hidden { display:none !important; }
+/* ===== MOBILE SUPPORT ===== */
+@media (max-width: 900px) {
+  html, body { width:100%; max-width:100%; overflow-x:hidden; }
+  body { height:100vh; height:100dvh; }
+  * { min-width:0; }
+
+  /* Topbar: row 1 = logo, title, icons. Row 2 = nav. Row 3 = search. */
+  #topbar { flex-wrap:wrap; gap:8px; padding:10px; }
+  #topbar img.logo { width:34px; height:34px; flex-shrink:0; }
+  .brand { flex:1; }
+  .brand h1 { font-size:15px; white-space:nowrap; }
+  .brand .sub, .spacer { display:none; }
+  #chargeCountPill { font-size:11px; padding:8px 10px; white-space:nowrap; }
+  #historyBtn, #settingsBtn { min-height:40px; min-width:40px; }
+  .nav { order:10; width:100%; margin:0; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; }
+  .nav::-webkit-scrollbar { display:none; }
+  .nav-btn { flex:0 0 auto; min-height:40px; font-size:12px; padding:10px 12px; }
+  .search-box { order:11; width:100%; }
+  .search-box input { width:100%; font-size:16px; }
+
+  /* Main area scrolls as one page */
+  #content { overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; }
+  .tab-panel {
+    position:relative; inset:auto; display:none; flex-direction:column;
+    width:100%; min-height:100%; overflow:visible; padding:10px; gap:12px;
+    box-sizing:border-box;
+  }
+  .tab-panel.active { display:flex; }
+  .col-left, .col-right {
+    width:100%; flex:none; overflow:visible; min-width:0;
+    display:flex; flex-direction:column; gap:10px; padding:0;
+  }
+
+  /* Cards, fields, and buttons stay inside the screen */
+  .card, .chart-wrap, .output-box, .notice { width:100%; max-width:100%; box-sizing:border-box; }
+  .card { padding:12px; }
+  .field-wrap { width:100%; }
+  .field-wrap input, .field-wrap textarea { width:100%; font-size:16px; min-height:44px; }
+  .btn-row { flex-direction:column; }
+  .btn-row .btn, .btn { width:100%; min-height:44px; }
+  .output-box { min-height:110px; max-height:40vh; font-size:12px; }
+  .notice { flex-direction:column; align-items:flex-start; gap:8px; }
+
+  /* Section pills: one scrolling row */
+  .sec-strip { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; width:100%; }
+  .sec-strip::-webkit-scrollbar { display:none; }
+  .sec-btn { flex:0 0 auto; min-height:38px; font-size:12px; }
+
+  /* Penal code list: fixed height box, each code stacks cleanly */
+  .code-list-wrap { flex:none; height:50vh; width:100%; }
+  .code-header-row { font-size:12px; padding:10px 12px; }
+  .col-heads { display:none; }
+  .code-row {
+    display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px;
+    padding:10px; border-left-width:3px;
+  }
+  .code-row .badge { order:1; width:auto; min-width:64px; }
+  .code-row .add-btn { order:2; margin-left:auto; min-height:36px; padding:8px 12px; }
+  .code-row .ref-text {
+    order:3; flex-basis:100%; white-space:normal; overflow:visible;
+    font-size:13px; color:var(--text); line-height:1.35;
+  }
+  .code-row .ref-text.match { color:var(--yellow); }
+  .pen-text, .cls-pill { display:none; }
+
+  /* Charge queue and chart */
+  .queue-wrap { max-height:130px; width:100%; }
+  .chart-row .clabel { width:64px; }
+  .totals-row { flex-wrap:wrap; gap:4px; }
+
+  /* Quick phrases */
+  .phr-columns { flex-direction:column; overflow:visible; }
+  .phr-row { flex-wrap:wrap; }
+  .phr-label { width:100%; }
+  .phr-text { width:100%; }
+
+  /* Dispatch */
+  .dispatch-log { min-height:40vh; }
+  .dispatch-input-row input { font-size:16px; }
+
+  /* Modals fill the screen */
+  .modal-overlay { padding:8px; }
+  .modal-box { width:100%; max-height:92vh; padding:16px; }
+
+  /* Toasts */
+  #toast-container { left:12px; right:12px; bottom:12px; }
+  .toast { text-align:center; }
+}
+@media (max-width: 900px) {
+  .sec-strip {
+    flex-wrap: wrap;
+    overflow: visible;
+    gap: 6px;
+  }
+  .sec-btn {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+    min-height: 38px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+  }
+
+  .nav {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+  .nav-btn {
+    flex: 1 1 calc(50% - 6px);
+    text-align: center;
+    white-space: nowrap;
+  }
+}
 </style>
 </head>
 <body>
@@ -1522,30 +1636,7 @@ function init(){
 }
 
 runSplash(init);
-// Desktop-only notice for phones/tablets
-(function(){
-  var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) 
-                 || (window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
-  if (!isMobile || localStorage.getItem("gvcr_pc_notice_dismissed")) return;
 
-  var overlay = document.createElement("div");
-  overlay.style.cssText = "position:fixed;inset:0;background:#05070d;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif;";
-  overlay.innerHTML =
-    '<div style="max-width:360px;text-align:center;color:#fff">' +
-      '<div style="font-size:60px;margin-bottom:16px">🖥️</div>' +
-      '<h2 style="margin:0 0 12px;font-size:22px">Best on Desktop</h2>' +
-      '<p style="color:#94a3b8;line-height:1.6;margin:0 0 24px;font-size:15px">' +
-        'The GVCR Citation Tool is designed for PC. Mobile support is HEAVILY discouraged and may be unusable.' +
-      '</p>' +
-      '<button id="pcNoticeContinue" style="background:#3b82f6;color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:15px;cursor:pointer">Continue Anyway</button>' +
-    '</div>';
-  document.body.appendChild(overlay);
-
-  document.getElementById("pcNoticeContinue").addEventListener("click", function(){
-    localStorage.setItem("gvcr_pc_notice_dismissed", "1");
-    overlay.remove();
-  });
-})();
 </script>
 </body>
 </html>
