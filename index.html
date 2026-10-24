@@ -1242,60 +1242,135 @@ function tally(arr){
   const m = new Map();
   arr.forEach(v => m.set(v, (m.get(v) || 0) + 1));
   return [...m].map(([k, n]) => n > 1 ? `${k} x${n}` : k).join(", ");
-} 
+}
+
+function sortedCharges(){
+  return [...state.charges].sort((a, b) => {
+    const aParts = (a.code.match(/\d+/g) || []).map(Number);
+    const bParts = (b.code.match(/\d+/g) || []).map(Number);
+
+    for(let i = 0; i < Math.max(aParts.length, bParts.length); i++){
+      const difference = (aParts[i] || 0) - (bParts[i] || 0);
+      if(difference !== 0) return difference;
+    }
+
+    return a.code.localeCompare(b.code);
+  });
+}
 
 function genCitation(){
-  if(!state.charges.length){ alert("Add at least one charge first."); return; }
+  if(!state.charges.length){
+    alert("Add at least one charge first.");
+    return;
+  }
+
+  const charges = sortedCharges();
   let prov = qs("#fProvider").value.trim() || "[Officer Name]";
-  let off  = qs("#fOffender").value.trim() || "[Offender Name]";
-  if(!prov.startsWith("@")) prov = "@"+prov;
-  if(!off.startsWith("@"))  off  = "@"+off;
-  const codes  = tally(state.charges.map(c=>c.code));
-const refs   = tally(state.charges.map(c=>c.ref));
-const pen    = buildPenalty(state.charges);
-const clss   = tally(state.charges.map(c=>c.cls));
-  state.lastCit = "Ticket Provider: " + prov + "\nSection: " + codes + "\nReference: " + refs + "\nPenalty: " + pen + "\nClassification: " + clss + "\nCount: " + state.charges.length + "\nOffender: " + off;
+  let off = qs("#fOffender").value.trim() || "[Offender Name]";
+
+  if(!prov.startsWith("@")) prov = "@" + prov;
+  if(!off.startsWith("@")) off = "@" + off;
+
+  const codes = tally(charges.map(c => c.code));
+  const refs = tally(charges.map(c => c.ref));
+  const pen = buildPenalty(charges);
+  const clss = tally(charges.map(c => c.cls));
+
+  state.lastCit =
+    "Ticket Provider: " + prov +
+    "\nSection: " + codes +
+    "\nReference: " + refs +
+    "\nPenalty: " + pen +
+    "\nClassification: " + clss +
+    "\nCount: " + charges.length +
+    "\nOffender: " + off;
+
   writeOutput("citOutput", state.lastCit);
   copyToClipboard(state.lastCit);
   appendHistory("citation", state.lastCit);
   toast("Citation copied!");
 }
-function copyCitation(){ if(!state.lastCit) return genCitation(); copyToClipboard(state.lastCit); toast("Copied!"); }
 
 function genArrest(){
+  const charges = sortedCharges();
   const officers = atPrefix(qs("#aOfficers").value.trim()) || "[Officer(s)]";
-  const depts    = qs("#aDept").value.trim() || "[Department(s)]";
+  const depts = qs("#aDept").value.trim() || "[Department(s)]";
   const suspects = atPrefix(qs("#aSuspects").value.trim()) || "[Suspect(s)]";
-  let codes="[No charges]", refs="[No charges]", clss="[No charges]", pen="[No charges]", count=0;
-  if(state.charges.length){
-  codes = tally(state.charges.map(c => c.code));
-  refs  = tally(state.charges.map(c => c.ref));
-  pen   = buildPenalty(state.charges);
-  clss  = tally(state.charges.map(c => c.cls));
-  count = state.charges.length;
+
+  let codes = "[No charges]";
+  let refs = "[No charges]";
+  let clss = "[No charges]";
+  let pen = "[No charges]";
+  let count = 0;
+
+  if(charges.length){
+    codes = tally(charges.map(c => c.code));
+    refs = tally(charges.map(c => c.ref));
+    clss = tally(charges.map(c => c.cls));
+    pen = buildPenalty(charges);
+    count = charges.length;
   }
-  state.lastArr = `Involved Officer(s): ${officers}\nDepartment(s): ${depts}\nSuspect(s): ${suspects}\n\n----------\n\nPenal Code Section: ${codes}\nReference(s): ${refs}\nPenaltie(s): ${pen}\nClassification(s): ${clss}\nCount: ${count}\n\n----------\n\nVehicle Make: N/A\nVehicle Model: N/A\nVehicle Plate: N/A\nVehicle Official Registry: N/A\n\n*Attached mugshot(s);*`;
+
+  state.lastArr =
+    `Involved Officer(s): ${officers}\n` +
+    `Department(s): ${depts}\n` +
+    `Suspect(s): ${suspects}\n\n` +
+    `----------\n\n` +
+    `Penal Code Section: ${codes}\n` +
+    `Reference(s): ${refs}\n` +
+    `Penaltie(s): ${pen}\n` +
+    `Classification(s): ${clss}\n` +
+    `Count: ${count}\n\n` +
+    `----------\n\n` +
+    `Vehicle Make: N/A\n` +
+    `Vehicle Model: N/A\n` +
+    `Vehicle Plate: N/A\n` +
+    `Vehicle Official Registry: N/A\n\n` +
+    `*Attached mugshot(s);*`;
+
   writeOutput("arrOutput", state.lastArr);
   copyToClipboard(state.lastArr);
   appendHistory("arrest", state.lastArr);
   toast("Arrest report copied!");
 }
-function copyArrest(){ if(!state.lastArr) return genArrest(); copyToClipboard(state.lastArr); toast("Copied!"); }
 
 function genWarrant(){
+  const charges = sortedCharges();
   const officers = atPrefix(qs("#wOfficers").value.trim()) || "[Officer(s)]";
-  const depts    = qs("#wDept").value.trim() || "[Department(s)]";
+  const depts = qs("#wDept").value.trim() || "[Department(s)]";
   const suspects = atPrefix(qs("#wSuspects").value.trim()) || "[Suspect(s)]";
-  let codes="[No charges]", refs="[No charges]", clss="[No charges]", pen="[No charges]", count=0;
-  if(state.charges.length){
-   codes  = tally(state.charges.map(c=>c.code));
-refs   = tally(state.charges.map(c=>c.ref));
-clss   = tally(state.charges.map(c=>c.cls));
-pen    = buildPenalty(state.charges);
-count  = state.charges.length;
+
+  let codes = "[No charges]";
+  let refs = "[No charges]";
+  let clss = "[No charges]";
+  let pen = "[No charges]";
+  let count = 0;
+
+  if(charges.length){
+    codes = tally(charges.map(c => c.code));
+    refs = tally(charges.map(c => c.ref));
+    clss = tally(charges.map(c => c.cls));
+    pen = buildPenalty(charges);
+    count = charges.length;
   }
+
   const dash = "———————————————";
-  state.lastWar = "Warrant Request #000\n\nInvolved Officer(s): " + officers + "\nDepartment(s): " + depts + "\nSuspect(s): " + suspects + "\n\n" + dash + "\n\nPenal Codes: " + codes + "\nReferences: " + refs + "\nPenalties: " + pen + "\nClassifications: " + clss + "\nCount: " + count + "\n\n" + dash + "\n\nDetailed Summary: [Enter summary here]\nEvidence: [Enter evidence here]";
+
+  state.lastWar =
+    "Warrant Request #000\n\n" +
+    "Involved Officer(s): " + officers +
+    "\nDepartment(s): " + depts +
+    "\nSuspect(s): " + suspects +
+    "\n\n" + dash + "\n\n" +
+    "Penal Codes: " + codes +
+    "\nReferences: " + refs +
+    "\nPenalties: " + pen +
+    "\nClassifications: " + clss +
+    "\nCount: " + count +
+    "\n\n" + dash + "\n\n" +
+    "Detailed Summary: [Enter summary here]\n" +
+    "Evidence: [Enter evidence here]";
+
   writeOutput("warOutput", state.lastWar);
   copyToClipboard(state.lastWar);
   appendHistory("warrant", state.lastWar);
