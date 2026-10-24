@@ -719,7 +719,7 @@ const PENAL_CODES = {
     ["(2)01","Driving on Learner's Permit Without Supervision","$500 + Impoundment of Vehicle","Misdemeanor"],
     ["(2)02","Driving with No / Invalid Vehicle Insurance","$750 + Impoundment of Vehicle","Misdemeanor"],
     ["(2)03","Driving with No / Invalid Vehicle Registration","$500 + Impoundment of Vehicle","Misdemeanor"],
-    ["(2)04","Driving on a Suspended License","$1,000 + 60 Sec of Jail Time + Impoundment of the Vehicle","Felony"],
+    ["(2)04","Driving on a Suspended License","$1,000 + 60 Seconds of Jail Time + Impoundment of the Vehicle","Felony"],
     ["(2)05","Failure to Sign a Citation","$1,000 + 30 Seconds of Jail Time","Misdemeanor"],
     ["(2)06","Operating Without a Valid License","$7,500 + 180 Seconds of Jail Time","Felony"]
   ],
@@ -1073,35 +1073,72 @@ function switchSection(sec){
   renderCodeList();
 }
 function renderCodeList(query){
-  query = (query !== undefined ? query : qs("#searchInput").value).trim().toLowerCase();
-  const wrap = qs("#codeListWrap"); wrap.innerHTML = "";
-  const sec = state.activeSection;
-  const codes = PENAL_CODES[sec] || [];
+  query = (query !== undefined ? query : qs("#searchInput").value)
+    .trim()
+    .toLowerCase();
 
-  wrap.appendChild(el("div", {class:"code-header-row", text:sec}));
-  const colHeads = el("div", {class:"col-heads"});
-  ["CODE","OFFENSE","PENALTY","CLASS"].forEach(t => colHeads.appendChild(el("span",{text:t})));
-  wrap.appendChild(colHeads);
+  const wrap = qs("#codeListWrap");
+  wrap.innerHTML = "";
+
+  // Empty search: show selected section.
+  // Search text entered: look through every section.
+  const sections = query
+    ? Object.entries(PENAL_CODES)
+    : [[state.activeSection, PENAL_CODES[state.activeSection] || []]];
 
   let shown = 0;
-  for(const [code, ref, penalty, cls] of codes){
-    const hay = (code+" "+ref+" "+penalty+" "+cls).toLowerCase();
-    if(query && !hay.includes(query)) continue;
-    shown++;
-    const row = el("div", {class:`code-row cls-${cls}`});
-    row.appendChild(el("div", {class:`badge cls-${cls}`, text:code}));
-    const refMatch = query && ref.toLowerCase().includes(query);
-    row.appendChild(el("div", {class:"ref-text"+(refMatch?" match":""), text:ref}));
-    row.appendChild(el("div", {class:"pen-text", text:penalty}));
-    row.appendChild(el("div", {class:`cls-pill cls-${cls}`, text:cls}));
-    const addBtn = el("button", {class:"add-btn", text:"+ Add"});
-    addBtn.addEventListener("click", (ev) => { ev.stopPropagation(); addCharge(sec,code,ref,penalty,cls); });
-    row.appendChild(addBtn);
-    row.addEventListener("click", () => addCharge(sec,code,ref,penalty,cls));
-    wrap.appendChild(row);
+
+  for(const [sec, codes] of sections){
+    const matches = codes.filter(([code, ref, penalty, cls]) =>
+      !query || (code + " " + ref + " " + penalty + " " + cls)
+        .toLowerCase()
+        .includes(query)
+    );
+
+    if(!matches.length) continue;
+
+    wrap.appendChild(el("div", {class:"code-header-row", text:sec}));
+
+    const colHeads = el("div", {class:"col-heads"});
+    ["CODE", "OFFENSE", "PENALTY", "CLASS"]
+      .forEach(t => colHeads.appendChild(el("span", {text:t})));
+    wrap.appendChild(colHeads);
+
+    for(const [code, ref, penalty, cls] of matches){
+      shown++;
+
+      const row = el("div", {class:`code-row cls-${cls}`});
+      row.appendChild(el("div", {class:`badge cls-${cls}`, text:code}));
+
+      const refMatch = query && ref.toLowerCase().includes(query);
+      row.appendChild(el("div", {
+        class:"ref-text" + (refMatch ? " match" : ""),
+        text:ref
+      }));
+
+      row.appendChild(el("div", {class:"pen-text", text:penalty}));
+      row.appendChild(el("div", {class:`cls-pill cls-${cls}`, text:cls}));
+
+      const addBtn = el("button", {class:"add-btn", text:"+ Add"});
+      addBtn.addEventListener("click", ev => {
+        ev.stopPropagation();
+        addCharge(sec, code, ref, penalty, cls);
+      });
+
+      row.appendChild(addBtn);
+      row.addEventListener("click", () =>
+        addCharge(sec, code, ref, penalty, cls)
+      );
+
+      wrap.appendChild(row);
+    }
   }
+
   if(!shown){
-    wrap.appendChild(el("div", {class:"empty-note", text:"No results match your search."}));
+    wrap.appendChild(el("div", {
+      class:"empty-note",
+      text:"No results match your search."
+    }));
   }
 }
 qs("#searchInput").addEventListener("input", (e) => renderCodeList(e.target.value));
@@ -1231,11 +1268,11 @@ function genArrest(){
   const suspects = atPrefix(qs("#aSuspects").value.trim()) || "[Suspect(s)]";
   let codes="[No charges]", refs="[No charges]", clss="[No charges]", pen="[No charges]", count=0;
   if(state.charges.length){
- const codes  = tally(state.charges.map(c=>c.code));
-const refs   = tally(state.charges.map(c=>c.ref));
-const pen    = buildPenalty(state.charges);
-const clss   = tally(state.charges.map(c=>c.cls));
-    count = state.charges.length;
+  codes = tally(state.charges.map(c => c.code));
+  refs  = tally(state.charges.map(c => c.ref));
+  pen   = buildPenalty(state.charges);
+  clss  = tally(state.charges.map(c => c.cls));
+  count = state.charges.length;
   }
   state.lastArr = `Involved Officer(s): ${officers}\nDepartment(s): ${depts}\nSuspect(s): ${suspects}\n\n----------\n\nPenal Code Section: ${codes}\nReference(s): ${refs}\nPenaltie(s): ${pen}\nClassification(s): ${clss}\nCount: ${count}\n\n----------\n\nVehicle Make: N/A\nVehicle Model: N/A\nVehicle Plate: N/A\nVehicle Official Registry: N/A\n\n*Attached mugshot(s);*`;
   writeOutput("arrOutput", state.lastArr);
