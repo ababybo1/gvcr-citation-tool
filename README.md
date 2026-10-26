@@ -1,6 +1,6 @@
 # GVCR Citation Maker
 
-Made by x3alpy (Tool Creator), ababyboi (Revamp), 27vq (Windows App Porter) and civoc (macOS App Porter)  
+Made by x3alpy, ababyboi, 27vq and civoc
 
 Citation Maker Tool for GVCR Law Enforcement to generate citations, arrest reports, and warrant requests quickly and efficiently. 
 
