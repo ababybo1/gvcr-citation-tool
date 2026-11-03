@@ -439,6 +439,7 @@
   <div class="spacer"></div>
   <div class="pill" id="chargeCountPill">0 charges</div>
   <div class="search-box"><span>⌕</span><input id="searchInput" placeholder="Search penal codes..."></div>
+ <button class="icon-btn" id="codesBtn" title="10-Codes" style="font-size:15px; padding:7px 11px;">📻</button>
   <button class="icon-btn" id="historyBtn" title="History">🕘</button>
   <button class="icon-btn" id="settingsBtn" title="Settings">⚙</button>
 </header>
@@ -568,7 +569,227 @@
     </div>
   </section>
 
+  <!-- ── SHIFT TAB ────────────────────────────────────────────────────── -->
+  <section class="tab-panel" id="tab-shift">
+    <div class="col-left" style="overflow-y:auto;">
+      <div class="notice" style="margin-bottom:14px;">
+        <span>⏱️ 1. Clock In ➔ 2. Clock Out ➔ 3. Fill details ➔ 4. Generate.</span>
+      </div>
+
+      <div class="card" style="text-align:center; padding:30px;">
+        <h2 style="font-size:28px; font-family:'Courier New',monospace; margin:0 0 10px;" id="shiftTimerDisplay">00:00:00</h2>
+        <p style="color:var(--text2); font-size:12px; margin-bottom:20px;" id="shiftTimerStatus">Off Duty (OCSO)</p>
+        
+        <div class="btn-row" style="justify-content:center;">
+          <button class="btn btn-accent" id="clockInBtn" style="max-width:200px;">🟢 Clock In</button>
+          <button class="btn btn-red hidden" id="clockOutBtn" style="max-width:200px;">🔴 Clock Out</button>
+        </div>
+      </div>
+
+      <p class="section-label" style="margin-top:10px;">Shift Details (Unlocks after Clock Out)</p>
+      <div class="card" id="shiftDetailsCard" style="opacity:0.5; pointer-events:none;">
+        <label class="field-label">Discord Username</label>
+        <div class="field-wrap"><input id="shiftOfficer" placeholder="e.g. @username"></div>
+        
+        <label class="field-label">Rank</label>
+        <div class="field-wrap"><input id="shiftRank" placeholder="e.g. Deputy, Corporal"></div>
+        
+        <label class="field-label">Shift Notes</label>
+        <div class="field-wrap"><textarea id="shiftNotes" rows="3" placeholder="What did you do this shift?"></textarea></div>
+      </div>
+    </div>
+    
+    <div class="col-right">
+      <button class="btn btn-indigo" id="genShiftBtn" style="width:100%" disabled>⚡ Generate Shift Log</button>
+      <button class="btn btn-green" id="copyShiftBtn" style="width:100%">📋 Copy Log</button>
+      <p class="section-label" style="margin-top:4px">Shift Log Output</p>
+      <div class="output-box" id="shiftOutput">Clock in, clock out, and generate to see the log.</div>
+    </div>
+  </section>
 </main>
+<!-- ── 10-CODES MODAL ─────────────────────────────────────────────────── -->
+<div class="modal-overlay hidden" id="codesModal">
+  <div class="modal-box" style="width:1000px; max-width:95vw;">
+    <h2>📻 Radio Language Reference</h2>
+    <p class="modal-sub">Standard 10-Codes, Phonetic Alphabet, and Response Codes.</p>
+    
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px; max-height:65vh; overflow-y:auto; padding-right:10px;">
+      
+      <!-- Column 1: 10-Codes (1-49) -->
+      <div class="card" style="margin:0; padding:12px;">
+        <h3 style="font-size:13px; color:var(--accent); margin:0 0 8px; text-transform:uppercase;">10-Codes (0-49)</h3>
+        <div style="font-size:12px; line-height:1.6;">
+          <b>10-0</b> Caution Indicator<br>
+          <b>10-1</b> Unable to copy/Unreadable<br>
+          <b>10-3</b> Single good/Officer is okay<br>
+          <b>10-4</b> Affirmative<br>
+          <b>10-5</b> Relay message<br>
+          <b>10-6</b> Busy<br>
+          <b>10-7</b> Out of Service<br>
+          <b>10-8</b> In Service/Clear<br>
+          <b>10-9</b> Repeat transmission<br>
+          <b>10-10</b> Fight in Progress<br>
+          <b>10-11</b> Dog Call<br>
+          <b>10-12</b> Standby<br>
+          <b>10-13</b> Road/Weather Conditions<br>
+          <b>10-14</b> Prowler Report<br>
+          <b>10-15</b> Civil Disturbance<br>
+          <b>10-16</b> Domestic Disturbance<br>
+          <b>10-17</b> Reporting Person<br>
+          <b>10-18</b> Quickly/Expedite<br>
+          <b>10-19</b> Return to...<br>
+          <b>10-20</b> Location<br>
+          <b>10-21</b> Telephone Number/Call<br>
+          <b>10-22</b> Disregard<br>
+          <b>10-23</b> Arrived on Scene<br>
+          <b>10-24</b> Assignment Completed<br>
+          <b>10-25</b> Meet with in person<br>
+          <b>10-26</b> Subject Detained<br>
+          <b>10-27</b> Drivers License Information<br>
+          <b>10-28</b> Vehicle Registration Information<br>
+          <b>10-29</b> Warrant Check Only<br>
+          <b>10-30</b> Unnecessary use of radio<br>
+          <b>10-31</b> Crime in Progress<br>
+          <b>10-32</b> Person With a Gun<br>
+          <b>10-33</b> Emergency<br>
+          <b>10-34</b> Riot<br>
+          <b>10-35</b> Major Crime Alert<br>
+          <b>10-36</b> Current Time<br>
+          <b>10-37</b> Suspicious Person/Vehicle<br>
+          <b>10-38</b> Stopping Suspicious Person/Vehicle<br>
+          <b>10-39</b> Urgent - Lights and Sirens<br>
+          <b>10-40</b> Silent - No Lights or Sirens<br>
+          <b>10-41</b> Beginning Tour of Duty<br>
+          <b>10-42</b> Ending Tour of Duty<br>
+          <b>10-43</b> Information<br>
+          <b>10-44</b> Permission to leave patrol area<br>
+          <b>10-45</b> Animal carcass at...<br>
+          <b>10-46</b> Motorist assist/disabled vehicle<br>
+          <b>10-47</b> Emergency road repairs<br>
+          <b>10-48</b> Traffic signal repair<br>
+          <b>10-49</b> Traffic signal out
+        </div>
+      </div>
+
+      <!-- Column 2: 10-Codes (50-99 + 11 Series) -->
+      <div class="card" style="margin:0; padding:12px;">
+        <h3 style="font-size:13px; color:var(--accent); margin:0 0 8px; text-transform:uppercase;">10-Codes (50+) & 11 Series</h3>
+        <div style="font-size:12px; line-height:1.6;">
+          <b>10-50</b> Crash (PDO, PI, F)<br>
+          <b>10-51</b> Tow request<br>
+          <b>10-52</b> Ambulance request<br>
+          <b>10-53</b> Road blocked at...<br>
+          <b>10-54</b> Livestock on highway<br>
+          <b>10-55</b> Impaired driver/OWI<br>
+          <b>10-56</b> Impaired pedestrian<br>
+          <b>10-57</b> Hit and run crash (PDO, PI, F)<br>
+          <b>10-58</b> Direct traffic/traffic control<br>
+          <b>10-59</b> Transport/escort<br>
+          <b>10-60</b> Officer in the area<br>
+          <b>10-61</b> Isolate for message<br>
+          <b>10-62</b> Reply to message<br>
+          <b>10-63</b> Make written copy<br>
+          <b>10-64</b> Message for local delivery<br>
+          <b>10-65</b> Reckless/erratic driver complaint<br>
+          <b>10-66</b> Message cancellation<br>
+          <b>10-67</b> Clear for net message<br>
+          <b>10-68</b> Dispatch information<br>
+          <b>10-69</b> Message received<br>
+          <b>10-70</b> Fire (vehicle/grass/structure)<br>
+          <b>10-71</b> Advise nature of fire<br>
+          <b>10-72</b> Fire progress report<br>
+          <b>10-73</b> Smoke report<br>
+          <b>10-74</b> Negative<br>
+          <b>10-75</b> Status check<br>
+          <b>10-76</b> Enroute<br>
+          <b>10-77</b> Estimated time of arrival<br>
+          <b>10-78</b> Officer needs assistance<br>
+          <b>10-79</b> Notify coroner<br>
+          <b>10-80</b> Pursuit/chase in progress<br>
+          <b>10-81</b> Intoximeter test<br>
+          <b>10-82</b> Reserve lodging<br>
+          <b>10-83</b> Work school crossing at...<br>
+          <b>10-84</b> If meeting... advise ETA<br>
+          <b>10-85</b> Overtime<br>
+          <b>10-86</b> Officer/operator on duty<br>
+          <b>10-87</b> Traffic stop<br>
+          <b>10-88</b> Present phone number for (10-21)<br>
+          <b>10-89</b> Bomb threat<br>
+          <b>10-90</b> Alarm<br>
+          <b>10-91</b> Pick up prisoner<br>
+          <b>10-92</b> Improperly parked vehicle<br>
+          <b>10-93</b> Blockade<br>
+          <b>10-94</b> Drag racing<br>
+          <b>10-95</b> Subject in custody/under arrest<br>
+          <b>10-96</b> Mentally disturbed person<br>
+          <b>10-97</b> Radio/signal test<br>
+          <b>10-98</b> Prison/jail break<br>
+          <b>10-99</b> Warrant<br>
+          <b>11-44</b> Person Deceased<br>
+          <b>11-99</b> Officer Down
+        </div>
+      </div>
+
+      <!-- Column 3: Phonetic & Response Codes -->
+      <div>
+        <div class="card" style="margin:0 0 16px 0; padding:12px;">
+          <h3 style="font-size:13px; color:var(--cyan); margin:0 0 8px; text-transform:uppercase;">Phonetic Alphabet</h3>
+          <div style="font-size:12px; line-height:1.6; column-count:2; column-gap:16px;">
+            <b>A</b> Alpha<br>
+            <b>B</b> Bravo<br>
+            <b>C</b> Charlie<br>
+            <b>D</b> Delta<br>
+            <b>E</b> Echo<br>
+            <b>F</b> Foxtrot<br>
+            <b>G</b> Golf<br>
+            <b>H</b> Hotel<br>
+            <b>I</b> India<br>
+            <b>J</b> Juliett<br>
+            <b>K</b> Kilo<br>
+            <b>L</b> Lima<br>
+            <b>M</b> Mike<br>
+            <b>N</b> November<br>
+            <b>O</b> Oscar<br>
+            <b>P</b> Papa<br>
+            <b>Q</b> Quebec<br>
+            <b>R</b> Romeo<br>
+            <b>S</b> Sierra<br>
+            <b>T</b> Tango<br>
+            <b>U</b> Uniform<br>
+            <b>V</b> Victor<br>
+            <b>W</b> Whiskey<br>
+            <b>X</b> X-ray<br>
+            <b>Y</b> Yankee<br>
+            <b>Z</b> Zebra
+          </div>
+        </div>
+
+        <div class="card" style="margin:0 0 16px 0; padding:12px;">
+          <h3 style="font-size:13px; color:var(--orange); margin:0 0 8px; text-transform:uppercase;">Codes</h3>
+          <div style="font-size:12px; line-height:1.6;">
+            <b>Code 0</b> Game Crash<br>
+            <b>Code 1</b> No Lights, No Sirens<br>
+            <b>Code 2</b> Lights, No Sirens<br>
+            <b>Code 3</b> Lights & Sirens<br>
+            <b>Code 4</b> Scene Under Control<br>
+            <b>Code 5</b> Felony Stop
+          </div>
+        </div>
+
+        <div class="card" style="margin:0; padding:12px;">
+          <h3 style="font-size:13px; color:var(--red); margin:0 0 8px; text-transform:uppercase;">Signals</h3>
+          <div style="font-size:12px; line-height:1.6;">
+            <b>Signal 11</b> Running Radar<br>
+            <b>Signal 100</b> Hold All but Emergency Traffic
+          </div>
+        </div>
+      </div>
+
+    </div>
+    
+    <div class="modal-close-row"><button class="btn btn-indigo" data-close="codesModal">Close</button></div>
+  </div>
+</div>
 
 <!-- ── SETTINGS MODAL ─────────────────────────────────────────────────── -->
 <div class="modal-overlay hidden" id="settingsModal">
@@ -1035,8 +1256,12 @@ function applyTheme(name){
    NAV / TABS
    ════════════════════════════════════════════════════════════════════ */
 const NAV_ITEMS = [
-  ["citation","🎫  Citation"], ["arrest","🚨  Arrest"], ["warrant","📋  Warrant"],
-  ["phrases","💬  Phrases"], ["dispatch","🎙  Dispatch"]
+  ["citation","🎫  Citation"], 
+  ["arrest","🚨  Arrest"], 
+  ["warrant","📋  Warrant"],
+  ["phrases","💬  Phrases"], 
+  ["dispatch","🎙  Dispatch"], 
+  ["shift","⏱️  Shift"],
 ];
 function buildNav(){
   const nav = qs("#navTabs"); nav.innerHTML = "";
@@ -1752,11 +1977,16 @@ function wireEvents(){
   qs("#copyArrBtn").addEventListener("click", copyArrest);
   qs("#genWarBtn").addEventListener("click", genWarrant);
   qs("#copyWarBtn").addEventListener("click", genWarrant);
+  qs("#clockInBtn").addEventListener("click", clockIn);
+  qs("#clockOutBtn").addEventListener("click", clockOut);
+  qs("#genShiftBtn").addEventListener("click", genShiftLog);
+  qs("#copyShiftBtn").addEventListener("click", copyShiftLog);
 
   qs("#settingsBtn").addEventListener("click", openSettingsModal);
   qs("#saveSettingsBtn").addEventListener("click", saveSettingsFromModal);
   qs("#selfHealBtn").addEventListener("click", runSelfHealUI);
 
+  qs("#codesBtn").addEventListener("click", () => openModal("codesModal"));
   qs("#historyBtn").addEventListener("click", () => { buildHistoryModal(); openModal("historyModal"); });
   qs("#clearHistBtn").addEventListener("click", clearHistoryUI);
 
@@ -1767,6 +1997,100 @@ function wireEvents(){
   qs("#dispatchInput").addEventListener("keydown", (e) => {
     if(e.key === "Enter"){ qs("#dispatchSendBtn").click(); }
   });
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   SHIFT TIMER (OCSO ONLY)
+   ════════════════════════════════════════════════════════════════════ */
+let shiftInterval = null;
+let shiftStartTime = null;
+let shiftEndTime = null;
+
+function formatDuration(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+  const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+  const s = String(totalSeconds % 60).padStart(2, '0');
+  return `${h}:${m}:${s}`;
+}
+
+function clockIn() {
+  shiftStartTime = new Date();
+  shiftEndTime = null;
+  
+  qs("#shiftTimerStatus").textContent = "On Duty (OCSO)";
+  qs("#shiftTimerStatus").style.color = "var(--green)";
+  
+  qs("#clockInBtn").classList.add("hidden");
+  qs("#clockOutBtn").classList.remove("hidden");
+  
+  qs("#genShiftBtn").disabled = true;
+  const detailsCard = qs("#shiftDetailsCard");
+  detailsCard.style.opacity = "0.5";
+  detailsCard.style.pointerEvents = "none";
+  qs("#shiftOfficer").value = "";
+  qs("#shiftRank").value = "";
+  qs("#shiftNotes").value = "";
+  
+  shiftInterval = setInterval(() => {
+    const now = new Date();
+    qs("#shiftTimerDisplay").textContent = formatDuration(now - shiftStartTime);
+  }, 1000);
+  
+  toast("Clocked In to OCSO!");
+}
+
+function clockOut() {
+  clearInterval(shiftInterval);
+  shiftEndTime = new Date();
+  
+  qs("#shiftTimerStatus").textContent = "Off Duty (OCSO)";
+  qs("#shiftTimerStatus").style.color = "var(--red)";
+  
+  qs("#clockOutBtn").classList.add("hidden");
+  qs("#clockInBtn").classList.remove("hidden");
+  
+  qs("#genShiftBtn").disabled = false;
+  const detailsCard = qs("#shiftDetailsCard");
+  detailsCard.style.opacity = "1";
+  detailsCard.style.pointerEvents = "auto";
+  
+  toast("Clocked Out! Fill in your details.");
+}
+
+function genShiftLog() {
+  if(!shiftStartTime || !shiftEndTime) return;
+  
+  const username = qs("#shiftOfficer").value.trim() || "[Username]";
+  const rank = qs("#shiftRank").value.trim() || "[Rank]";
+  const notes = qs("#shiftNotes").value.trim() || "[No notes provided]";
+  
+  const startStr = shiftStartTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const endStr = shiftEndTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const duration = formatDuration(shiftEndTime - shiftStartTime);
+  
+  const output = 
+    "`OUTAGAMIE COUNTY SHERIFF'S OFFICE - SHIFT REPORT`\n\n" +
+    "`Username:` " + username + "\n" +
+    "`Rank:` " + rank + "\n" +
+    "`Shift Duration:` " + duration + " (" + startStr + " - " + endStr + ")\n" +
+    "`Notes:` " + notes + "\n" +
+    "`Image Proof:`";
+    
+  writeOutput("shiftOutput", output);
+  copyToClipboard(output);
+  appendHistory("shift", output);
+  toast("Shift Log generated and copied!");
+}
+
+function copyShiftLog() {
+  const text = qs("#shiftOutput").textContent;
+  if(text && text !== "Clock in, clock out, and generate to see the log.") {
+    copyToClipboard(text);
+    toast("Copied!");
+  } else {
+    toast("Generate a shift log first.");
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════════
