@@ -12,6 +12,6 @@ Implemented by executives.
 
 Usage for things outside of GVCR purposes must first be contacted to me (ababyboi, Discord) before waiting for approval.
 
-Licensed under MIT. Attribution required: Credit x3alpy, ababyboi, 27vq and civoc if you fork or modify.
+Attribution required. Credit x3alpy and ababyboi if you fork or modify.
 
 GVCR P/S
