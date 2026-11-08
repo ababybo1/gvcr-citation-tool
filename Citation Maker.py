@@ -28,8 +28,8 @@ from tkinter import messagebox
 import pyperclip
 
 # ── Embedded Logo ─────────────────────────────────────────────────────────────
-LOGO_B64_48  = "LOGO48"
-LOGO_B64_110 = "LOGO110"
+LOGO_B64_48  = "iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAABgFBMVEUAAAABAQECAQMDAQUFAQEFAgoIAgIJAggDAQAMAgIEAg4XAgMRAgMGAxUKAQIIBB0IBSgdAgUMAg9CAwclAgQHBzAWAxsuAwUOHGYICjobBw4IDkhqBwuKCAwXQqIUAg8lAhKpEhgZDh8pEBjvFhjdDhryHB14DA0TOKQdNI4SUMIbGyk3AwgWBisTEF78FxwKFFexCTDtoE4mCzAkGkVaBAUNL50XDkI+Ch6VjqKShZscO9y9BgM8EmB92+5sEDYOFXFTChR2gbUeKH8LWM0fOcfuIS7maknpR1FFPGNkRXUxFmorEyeTTHKDkbUNJY54CEbo+/QSIMSmFCoXK8jhMzKKxOvFFRoiet9xx+fTV3ZGquEnZNStZoYvb93LS2Xwr2UPH3qkdY3wOUtYBh7dSEJLCkM/RYJ8BidsMWuHCkcGK3+9S3GfAQDsMyGOMmMqPcHCMlMMRLnuv1Ukg+UjSd1WtOnrNkpFm+OZ9PKo3eSIgq3mhVHn6n7r5o7nynXKuKGoAAACw0lEQVRIx+2VV1fbQBCFkVbatSwhWXLHAjvuBdv0Dsb0Tmihl0B67z3hr2dmJUpCwjl5Dt/xi33unVmN5q4bGm74DxE44jkeUYTv1xtEcg6VJPhIHuGa6iLqGZNlmQGU6jqlVILfhaud8FcR1VyPBoWDDkkUf7MIHgDa8+pexGJM4ygUuhDHcOFAsUSpI29ELEvTVERTFJ0SIpJLPQSsTrke5QZixeMmR4UmjIGDH8ut70E51RmzQO7jhEJNiTAQCIAFO3OLYxCwvKLDA4LB8AWj0WgQDIlWPxIOmNCCEHAQ3kIQoL6uaE1IshyNtUUikbbezs6+up3L5ex6XyqVTCYNr0ycQ6EeijelUqmFha6uyHihBXg4N7e4+OxwZ2f/+HhgoL+/f6BEZD6rBl5fVevNSG14PP+mOFFsKcw+fvn648nJzMzh/texsbGlpVmCPbgBzqOauXQ1m622jx982h4Z+VAsDN9uz3S8PeqY3qgVJicnXxVKFnMMEgV5OJzLZDbuT62N7u1+WVm5M5EfftKeOfr+43R66t7d94Pr68sl5h4JRgQdNDudTmera6MHu9sjn8Ewjx06vk3PgGFwdXWwp+To8aE9MFTFfwupVVqKe1vvtor5+QePNl9kq9n0Zr23UqlEupIyH6vgjBV6qGYgESqXY6PLPfmep5Hezj77+dDQUHN3a0DVdF13pyrwzcDBgiUeCvnc9xALlhP+btu2u/1hE940I259d5fwVSuKZRmGLxqNxWIXr7o1DA0U6urPDNxBGd8MXxDxGQYsXwAwYTP4ul5OBDpwu2UvrCrfPcNotOKq6e731TxgOiE+kIZGZ73dRMBqYxyuJu4s/zxuPEBeL6RU55mmErmIwq+hhkdzAgpAAvAagCSKHuHPl417acgOOBciuWf/++2EQeSXkng2l+vUl68/3IGbv4Ib/oWfYBlYP6inUyAAAAAASUVORK5CYII="
+LOGO_B64_110 = "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"
 
 # ── Theme Presets ──────────────────────────────────────────────────────────────
 # Semantic colors (classification / branding) stay constant across all themes
@@ -1154,8 +1154,8 @@ class App(tk.Tk):
         sub.pack(anchor="w")
         tk.Label(sub,text="Greenville Community Roleplay  ·  Public Services  · ",
                  font=(FONT(),8),bg=PANEL,fg=MUTED).pack(side="left")
-        ShinyLabel(sub,text="Made by x3alpy",
-                   font=(FONT(),8,"bold"),bg=PANEL,width=100).pack(side="left")
+        ShinyLabel(sub,text="Made by x3alpy and ababyboi",
+                   font=(FONT(),8,"bold"),bg=PANEL,width=220).pack(side="left")
 
         nav=tk.Frame(bar,bg=PANEL)
         nav.pack(side="left",padx=20,pady=10)
@@ -1790,11 +1790,11 @@ class App(tk.Tk):
         duration = f"{secs // 3600:02d}:{(secs % 3600) // 60:02d}:{secs % 60:02d}"
         
         self._last_shift = (
-            "`OUTAGAMIE COUNTY SHERIFF'S OFFICE - SHIFT REPORT`\n\n"
-            "`Username:` " + username + "\n"
-            "`Rank:` " + rank + "\n"
-            "`Shift Duration:` " + duration + " (" + start_str + " - " + end_str + ")\n"
-            "`Notes:` " + notes + "\n"
+            "OUTAGAMIE COUNTY SHERIFF'S OFFICE - SHIFT REPORT\n\n"
+            "Username: " + username + "\n"
+            "Rank: " + rank + "\n"
+            "Shift Duration: " + duration + " (" + start_str + " - " + end_str + ")\n"
+            "Notes: " + notes + "\n"
             "`Image Proof:`"
         )
         self._write(self._shift_out, self._last_shift)
