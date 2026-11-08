@@ -4,7 +4,6 @@
 <!-- Greenville Community Roleplay  ·  Public Services -->
 <!-- ───────────────────────────────────────────────────────────────────────────── -->
 
-
 <!DOCTYPE html>
 <html lang="en" data-theme="Midnight Blue">
 <head>
@@ -153,6 +152,7 @@
   /* ── Layout ─────────────────────────────────────────────────────────── */
   #content { flex:1; overflow:hidden; position:relative; }
   .tab-panel { position:absolute; inset:0; display:none; padding:14px; gap:14px; overflow:hidden; }
+  .tab-panel[style*="display: flex"] { display: flex !important; }
   .tab-panel.active { display:flex; }
   .col-left { flex:1; display:flex; flex-direction:column; min-width:0; gap:8px; }
   .col-right { width:390px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; overflow-y:auto; padding-right:2px; }
@@ -308,6 +308,7 @@
   .toast.show { opacity:1; transform:translateY(0); }
 
   .hidden { display:none !important; }
+
 /* ===== MOBILE SUPPORT ===== */
 @media (max-width: 900px) {
   html, body { width:100%; max-width:100%; overflow-x:hidden; }
@@ -446,7 +447,6 @@
   <div class="spacer"></div>
   <div class="pill" id="chargeCountPill">0 charges</div>
   <div class="search-box"><span>⌕</span><input id="searchInput" placeholder="Search penal codes..."></div>
- <button class="icon-btn" id="codesBtn" title="10-Codes" style="font-size:15px; padding:7px 11px;">📻</button>
   <button class="icon-btn" id="historyBtn" title="History">🕘</button>
   <button class="icon-btn" id="settingsBtn" title="Settings">⚙</button>
 </header>
@@ -613,127 +613,100 @@
       <div class="output-box" id="shiftOutput">Clock in, clock out, and generate to see the log.</div>
     </div>
   </section>
-</main>
-<!-- ── 10-CODES MODAL ─────────────────────────────────────────────────── -->
-<div class="modal-overlay hidden" id="codesModal">
-  <div class="modal-box" style="width:1000px; max-width:95vw;">
-    <h2>📻 Radio Language</h2>
-    <p class="modal-sub">10-Codes, Signals, Response Codes, and Phonetic Alphabet.</p>
+
+  <!-- ── RADIO COMM TAB ───────────────────────────────────────────────── -->
+<section class="tab-panel" id="tab-radio" style="flex-direction: column; overflow-y: auto;">
     
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px; max-height:65vh; overflow-y:auto; padding-right:10px;">
+    <!-- TOP: Text-to-Speech -->
+    <div class="card" style="margin-bottom:14px; flex-shrink:0;">
+      <p class="section-label">📢 Text-to-Speech Radio</p>
+      <p style="font-size:11px;color:var(--muted);margin:0 0 10px;">
+        Type your radio transmission below. Click Speak to play it out loud.
+      </p>
+      <div class="field-wrap" style="margin-bottom:10px;">
+        <textarea id="ttsInput" rows="2" placeholder="e.g. 10-4, show me 10-8 at the Speedway..."></textarea>
+      </div>
+      <div class="btn-row" style="max-width:400px;">
+        <button class="btn btn-accent" onclick="speakTTS()">🔊 Speak</button>
+        <button class="btn btn-red" onclick="stopTTS()">🛑 Stop</button>
+      </div>
+    </div>
+
+    <!-- BOTTOM: 2-Column Layout (Codes Left, Guide Right) -->
+    <div style="display:flex; gap:14px; width:100%; align-items:flex-start; flex-wrap: wrap;">
       
-      <div class="card" style="margin:0; padding:12px;">
-        <h3 style="font-size:13px; color:var(--accent); margin:0 0 8px; text-transform:uppercase;">10-Codes</h3>
-        <div style="font-size:12px; line-height:1.6;">
-          <b>10-1</b> Receiving Poorly / Switch Voice Channels [Tac / Scene]<br>
-          <b>10-2</b> Receiving Well<br>
-          <b>10-3</b> Stop Transmitting<br>
-          <b>10-4</b> O.K. / Affirm<br>
-          <b>10-5</b> Relay<br>
-          <b>10-6</b> Busy<br>
-          <b>10-7</b> Out Of Service<br>
-          <b>10-8</b> In Service<br>
-          <b>10-9</b> Repeat<br>
-          <b>10-10</b> Fight in progress<br>
-          <b>10-11</b> Traffic Stop<br>
-          <b>10-12</b> Active Ride Along<br>
-          <b>10-13</b> Shots Fired<br>
-          <b>10-15</b> Subject in custody en route to Station<br>
-          <b>10-16</b> Stolen Vehicle<br>
-          <b>10-17</b> Suspicious Person<br>
-          <b>10-20</b> Location<br>
-          <b>10-22</b> Disregard<br>
-          <b>10-23</b> Arrived on Scene<br>
-          <b>10-25</b> Domestic Dispute<br>
-          <b>10-26</b> ETA<br>
-          <b>10-27</b> Driver's License Check for Valid<br>
-          <b>10-28</b> Vehicle License Plate Check<br>
-          <b>10-29</b> NCIC Warrant Check<br>
-          <b>10-30</b> Wanted Person<br>
-          <b>10-31</b> Not Wanted No Warrants<br>
-          <b>10-32</b> Request Backup (Code 1-2-3)<br>
-          <b>10-35</b> Wrap The Scene Up<br>
-          <b>10-41</b> Beginning Tour of Duty<br>
-          <b>10-42</b> Ending Tour of Duty<br>
-          <b>10-43</b> Information<br>
-          <b>10-49</b> Homicide<br>
-          <b>10-50</b> Vehicle Accident: PD: Property Damage Only, PI: Person/s Injured, F: Fatal<br>
-          <b>10-51</b> Request Towing Service<br>
-          <b>10-52</b> Request EMS<br>
-          <b>10-53</b> Request Fire Department<br>
-          <b>10-55</b> Intoxicated Driver<br>
-          <b>10-56</b> Intoxicated Pedestrian<br>
-          <b>10-60</b> Armed with a Gun<br>
-          <b>10-61</b> Armed with a Knife<br>
-          <b>10-62</b> Kidnapping<br>
-          <b>10-65</b> Escorting Prisoner<br>
-          <b>10-66</b> Reckless Driver<br>
-          <b>10-67</b> Fire<br>
-          <b>10-68</b> Armed Robbery<br>
-          <b>10-70</b> Foot Pursuit<br>
-          <b>10-71</b> Request/Active Supervisor<br>
-          <b>10-73</b> Advice Status<br>
-          <b>10-80</b> Vehicle Pursuit<br>
-          <b>10-97</b> In Route<br>
-          <b>10-99</b> Officer In Distress Extreme Emergency Only<br>
-          <b>11-44</b> Person Deceased
+      <!-- LEFT SIDE: 10-Codes, Signals, Phonetic -->
+      <div style="flex:1; display:grid; grid-template-columns: 1fr 1fr; gap:14px; align-items:start; min-width: 400px;">
+        
+        <div class="card" style="margin:0;">
+          <p class="section-label" style="color:var(--accent);">10-Codes</p>
+          <div id="radioCodesList" style="font-size:12px; line-height:1.6; column-count: 2;"></div>
         </div>
+        
+        <div class="card" style="margin:0;">
+          <p class="section-label" style="color:var(--orange);">Signals & Codes</p>
+          <div id="radioSignalsList" style="font-size:12px; line-height:1.6;"></div>
+        </div>
+
+        <div class="card" style="margin:0;">
+          <p class="section-label" style="color:var(--cyan);">Phonetic Alphabet</p>
+          <div id="radioPhoneticList" style="font-size:12px; line-height:1.6; column-count:3;"></div>
+        </div>
+
       </div>
 
-      <div>
-        <div class="card" style="margin:0 0 16px 0; padding:12px;">
-          <h3 style="font-size:13px; color:var(--orange); margin:0 0 8px; text-transform:uppercase;">Signals & Codes</h3>
-          <div style="font-size:12px; line-height:1.6;">
-            <b>Signal 11</b> Running Radar (10-20 Location) - Stationary while checking peoples speeds<br>
-            <b>Signal 100</b> Hold all but emergency traffic - Do not Transmit if you are not part of the emergency traffic like; Priorities<br><br>
-            <b>Code 1</b> Routine Response<br>
-            <b>Code 2</b> Expedite // Emergency Lights ONLY<br>
-            <b>Code 3</b> Response using lights and Siren<br>
-            <b>Code 4</b> Cancel Responding Units<br>
-            <b>Code 5</b> High-Risk Stop // Felony Stop (10-32 recommended)<br>
-            <b>Code 6</b> Responding From A Long Distance<br>
-            <b>Code 9</b> Set Up A RoadBlock
-          </div>
-        </div>
+      <!-- RIGHT SIDE: Radio Guide -->
+      <div style="width: 320px; flex-shrink: 0;">
+        <div class="card" style="margin:0;">
+          <p class="section-label" style="color:var(--yellow);">📖 Radio Guide</p>
+          
+          <div style="font-size:12px; line-height:1.5; color:var(--text2);">
+            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Going Busy (10-6, 10-11, 10-50):</p>
+            <p style="margin-bottom:15px;">When clear, report back in RTO: <br><i>"(Callsign) Show me back 10-8"</i></p>
 
-        <div class="card" style="margin:0; padding:12px;">
-          <h3 style="font-size:13px; color:var(--cyan); margin:0 0 8px; text-transform:uppercase;">NATO Phonetic Alphabet</h3>
-          <div style="font-size:12px; line-height:1.6; column-count:2; column-gap:16px;">
-            <b>A</b> - Alpha<br>
-            <b>B</b> - Bravo<br>
-            <b>C</b> - Charlie<br>
-            <b>D</b> - Delta<br>
-            <b>E</b> - Echo<br>
-            <b>F</b> - Foxtrot<br>
-            <b>G</b> - Golf<br>
-            <b>H</b> - Hotel<br>
-            <b>I</b> - India<br>
-            <b>J</b> - Juliet<br>
-            <b>K</b> - Kilo<br>
-            <b>L</b> - Lima<br>
-            <b>M</b> - Mike<br>
-            <b>N</b> - November<br>
-            <b>O</b> - Oscar<br>
-            <b>P</b> - Papa<br>
-            <b>Q</b> - Quebec<br>
-            <b>R</b> - Romeo<br>
-            <b>S</b> - Sierra<br>
-            <b>T</b> - Tango<br>
-            <b>U</b> - Uniform<br>
-            <b>V</b> - Victor<br>
-            <b>W</b> - Whiskey<br>
-            <b>X</b> - X-ray<br>
-            <b>Y</b> - Yankee<br>
-            <b>Z</b> - Zulu
+            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Starting/Ending Shift:</p>
+            <p style="margin-bottom:5px;">Start: <i>"(Callsign) Show me 10-8, 10-41 for the Wisconsin State Patrol"</i></p>
+            <p style="margin-bottom:15px;">End: <i>"(Callsign) Show me 10-7, 10-42 for the Wisconsin State Patrol"</i></p>
+
+            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Traffic Stops (Correct):</p>
+            <p style="margin-bottom:5px;"><i>"(Callsign) Show me on a 10-11 with a (doors) (Vehicle Type), 10-28 reading (State Tag) Tag (Letters). 10-20 is going to be Driving (N,E,W,S)bound (Street name) near (location), 10-32 is/not Required"</i></p>
+            <p style="margin-bottom:15px;">Example: <i>"103 Show me on a 10-11 with a 4 door SUV 10-28 reading Wisconsin Tag Alpha Bravo Charlie 123 10-20 is going to be driving Northbound Greenville Dr near Cenex, 10-32 not required."</i></p>
+
+            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Traffic Stops (Acceptable):</p>
+            <p style="margin-bottom:5px;"><i>"(callsign) Show me on a 10-11 with a (car Description) reading (License Plate letters) 10-20 (location) 10-32 required/not required"</i></p>
+            <p style="margin-bottom:15px;">Example: <i>"103 Show me on a 10-11 with a blue BKM reading Alpha Bravo Charlie 123 10-20 is cenex no 10-32 Required"</i></p>
+            <p style="margin-bottom:15px; color:var(--red);">*If felony stop or arrest stop, advise its a Code 5.*</p>
+
+            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">911 Calls:</p>
+            <p style="margin-bottom:5px;"><i>"(Callsign) Show me 10-97 to the 911 call, 10-20 is (location)"</i></p>
+            <p style="margin-bottom:15px;">If location unknown, say "Unknown".</p>
+
+            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Motor Vehicle Accidents:</p>
+            <p style="margin-bottom:5px;"><i>"(Callsign) Show me 10-23 (Major/Minor) 10-50, 10-20 is going to be (location)"</i></p>
+            <p style="margin-bottom:15px;">Example: <i>"103 Show me on a Major 10-50, 10-20 is going to be fox mountain near the intersection"</i></p>
+
+            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Priority (Pursuits):</p>
+            <p style="margin-bottom:5px;"><i>"(Callsign) 10-80 10-80, 10-20 is going to be driving (N,E,W,S)bound (street name) passing/at (location) Signal 100 in affect"</i></p>
+            <p style="margin-bottom:5px;">Example: <i>"103 10-80 10-80 10-20 is going to be driving northbound GV Dr passing fox mountain signal 100 in affect"</i></p>
+            <p style="margin-bottom:15px;">*Report speed, turns, behavior, request PIT. Callsign changes to your position (1st Priority, 2nd Secondary, 3rd Tertiary, etc).*</p>
+
+            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Direct:</p>
+            <p style="margin-bottom:5px;">To speak to someone specifically: <i>"(Callsign) Direct (their Callsign)"</i></p>
+            <p style="margin-bottom:5px;">They reply: <i>"(your callsign) Direct"</i></p>
+            <p style="margin-bottom:15px;">Example: 103: <i>"103 Direct 102"</i> | 102: <i>"103 Direct"</i> | 103: <i>"(message)"</i></p>
+
+            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Switching Frequency:</p>
+            <p style="margin-bottom:15px;"><i>"(Callsign) Show me 10-1 (VC channel)"</i></p>
+
+            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Backup Calls:</p>
+            <p style="margin-bottom:5px;"><i>"(Callsign) Requesting 10-32, My 10-20 is going to be (location) Code (1-2-3). For a (Reason)."</i></p>
           </div>
         </div>
       </div>
 
     </div>
-    
-    <div class="modal-close-row"><button class="btn btn-indigo" data-close="codesModal">Close</button></div>
-  </div>
-</div>
+  </section>
+</main>
 
 <!-- ── SETTINGS MODAL ─────────────────────────────────────────────────── -->
 <div class="modal-overlay hidden" id="settingsModal">
@@ -978,34 +951,6 @@ function getCodeNote(code){
   return CODE_NOTES[code] || "";
 }
 
-function injectCodeNotes(){
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  const hits = [];
-  while(walker.nextNode()){
-    const node = walker.currentNode;
-    const t = node.textContent.trim();
-    if(CODE_NOTES[t] && node.parentElement) hits.push(node.parentElement);
-  }
-  hits.forEach(el => {
-    const row = el.closest("tr, li, .charge-item, .charge") || el.parentElement;
-    if(!row || row.dataset.noteAdded) return;
-    row.dataset.noteAdded = "1";
-    const note = document.createElement("div");
-    note.className = "code-note";
-    note.textContent = "↳ " + CODE_NOTES[el.textContent.trim()];
-    note.style.cssText = "font-size:12px;color:#94a3b8;font-style:italic;padding:4px 10px 8px;white-space:normal;line-height:1.4;";
-    row.insertAdjacentElement("afterend", note);
-  });
-}
-
-// Run now, and again whenever the list re-renders (search, adding charges, etc.)
-injectCodeNotes();
-let noteTimer = null;
-new MutationObserver(() => {
-  clearTimeout(noteTimer);
-  noteTimer = setTimeout(injectCodeNotes, 50);
-}).observe(document.body, { childList: true, subtree: true });
-
 const DISPATCH_COMMANDS = [
   [["generate citation","make citation","create citation"], "cmdGenCitation", "Generate the current citation"],
   [["generate arrest report","make arrest report","create arrest report","generate arrest"], "cmdGenArrest", "Generate the arrest report"],
@@ -1204,8 +1149,9 @@ const NAV_ITEMS = [
   ["arrest","🚨  Arrest"], 
   ["warrant","📋  Warrant"],
   ["phrases","💬  Phrases"], 
-  ["dispatch","🎙  Dispatch"], 
   ["shift","⏱️  Shift"],
+  ["radio","📻  Radio Comm"],
+  ["dispatch","🎙  Dispatch"], 
 ];
 function buildNav(){
   const nav = qs("#navTabs"); nav.innerHTML = "";
@@ -1742,6 +1688,204 @@ const DISPATCH_HANDLERS = {
   }
 };
 
+/* ════════════════════════════════════════════════════════════════════
+   SHIFT TIMER (OCSO ONLY)
+   ════════════════════════════════════════════════════════════════════ */
+let shiftInterval = null;
+let shiftStartTime = null;
+let shiftEndTime = null;
+
+function formatDuration(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+  const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+  const s = String(totalSeconds % 60).padStart(2, '0');
+  return `${h}:${m}:${s}`;
+}
+
+function clockIn() {
+  shiftStartTime = new Date();
+  shiftEndTime = null;
+  
+  qs("#shiftTimerStatus").textContent = "On Duty (OCSO)";
+  qs("#shiftTimerStatus").style.color = "var(--green)";
+  
+  qs("#clockInBtn").classList.add("hidden");
+  qs("#clockOutBtn").classList.remove("hidden");
+  
+  qs("#genShiftBtn").disabled = true;
+  const detailsCard = qs("#shiftDetailsCard");
+  detailsCard.style.opacity = "0.5";
+  detailsCard.style.pointerEvents = "none";
+  qs("#shiftOfficer").value = "";
+  qs("#shiftRank").value = "";
+  qs("#shiftNotes").value = "";
+  
+  shiftInterval = setInterval(() => {
+    const now = new Date();
+    qs("#shiftTimerDisplay").textContent = formatDuration(now - shiftStartTime);
+  }, 1000);
+  
+  toast("Clocked In to OCSO!");
+}
+
+function clockOut() {
+  clearInterval(shiftInterval);
+  shiftEndTime = new Date();
+  
+  qs("#shiftTimerStatus").textContent = "Off Duty (OCSO)";
+  qs("#shiftTimerStatus").style.color = "var(--red)";
+  
+  qs("#clockOutBtn").classList.add("hidden");
+  qs("#clockInBtn").classList.remove("hidden");
+  
+  qs("#genShiftBtn").disabled = false;
+  const detailsCard = qs("#shiftDetailsCard");
+  detailsCard.style.opacity = "1";
+  detailsCard.style.pointerEvents = "auto";
+  
+  toast("Clocked Out! Fill in your details.");
+}
+
+function genShiftLog() {
+  if(!shiftStartTime || !shiftEndTime) return;
+  
+  const username = qs("#shiftOfficer").value.trim() || "[Username]";
+  const rank = qs("#shiftRank").value.trim() || "[Rank]";
+  const notes = qs("#shiftNotes").value.trim() || "[No notes provided]";
+  
+  const startStr = shiftStartTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const endStr = shiftEndTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const duration = formatDuration(shiftEndTime - shiftStartTime);
+  
+  const output = 
+    "OUTAGAMIE COUNTY SHERIFF'S OFFICE - SHIFT REPORT\n\n" +
+    "Username: " + username + "\n" +
+    "Rank: " + rank + "\n" +
+    "Shift Duration: " + duration + " (" + startStr + " - " + endStr + ")\n" +
+    "Notes: " + notes + "\n" +
+    "Image Proof:";
+    
+  writeOutput("shiftOutput", output);
+  copyToClipboard(output);
+  appendHistory("shift", output);
+  toast("Shift Log generated and copied!");
+}
+
+function copyShiftLog() {
+  const text = qs("#shiftOutput").textContent;
+  if(text && text !== "Clock in, clock out, and generate to see the log.") {
+    copyToClipboard(text);
+    toast("Copied!");
+  } else {
+    toast("Generate a shift log first.");
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   RADIO COMM
+   ════════════════════════════════════════════════════════════════════ */
+const RADIO_DATA = {
+  codes: [
+    "10-1 Receiving Poorly / Switch Voice Channels [Tac / Scene]", "10-2 Receiving Well",
+    "10-3 Stop Transmitting", "10-4 O.K. / Affirm", "10-5 Relay", "10-6 Busy",
+    "10-7 Out Of Service", "10-8 In Service", "10-9 Repeat", "10-10 Fight in progress",
+    "10-11 Traffic Stop", "10-12 Active Ride Along", "10-13 Shots Fired",
+    "10-15 Subject in custody en route to Station", "10-16 Stolen Vehicle",
+    "10-17 Suspicious Person", "10-20 Location", "10-22 Disregard", "10-23 Arrived on Scene",
+    "10-25 Domestic Dispute", "10-26 ETA", "10-27 Driver's License Check for Valid",
+    "10-28 Vehicle License Plate Check", "10-29 NCIC Warrant Check", "10-30 Wanted Person",
+    "10-31 Not Wanted No Warrants", "10-32 Request Backup (Code 1-2-3)", "10-35 Wrap The Scene Up",
+    "10-41 Beginning Tour of Duty", "10-42 Ending Tour of Duty", "10-43 Information", "10-49 Homicide",
+    "10-50 Vehicle Accident: PD: Property Damage Only, PI: Person/s Injured, F: Fatal",
+    "10-51 Request Towing Service", "10-52 Request EMS", "10-53 Request Fire Department",
+    "10-55 Intoxicated Driver", "10-56 Intoxicated Pedestrian", "10-60 Armed with a Gun",
+    "10-61 Armed with a Knife", "10-62 Kidnapping", "10-65 Escorting Prisoner", "10-66 Reckless Driver",
+    "10-67 Fire", "10-68 Armed Robbery", "10-70 Foot Pursuit", "10-71 Request/Active Supervisor",
+    "10-73 Advice Status", "10-80 Vehicle Pursuit", "10-97 In Route",
+    "10-99 Officer In Distress Extreme Emergency Only", "11-44 Person Deceased"
+  ],
+  signals: [
+    "Signal 11 Running Radar (10-20 Location) - Stationary while checking peoples speeds",
+    "Signal 100 Hold all but emergency traffic - Do not Transmit if you are not part of the emergency traffic like; Priorities",
+    "Code 1 Routine Response", "Code 2 Expedite // Emergency Lights ONLY",
+    "Code 3 Response using lights and Siren", "Code 4 Cancel Responding Units",
+    "Code 5 High-Risk Stop // Felony Stop (10-32 recommended)", "Code 6 Responding From A Long Distance",
+    "Code 9 Set Up A RoadBlock"
+  ],
+  phonetic: [
+    "A - Alpha", "B - Bravo", "C - Charlie", "D - Delta", "E - Echo", "F - Foxtrot",
+    "G - Golf", "H - Hotel", "I - India", "J - Juliet", "K - Kilo", "L - Lima",
+    "M - Mike", "N - November", "O - Oscar", "P - Papa", "Q - Quebec", "R - Romeo",
+    "S - Sierra", "T - Tango", "U - Uniform", "V - Victor", "W - Whiskey", "X - X-ray",
+    "Y - Yankee", "Z - Zulu"
+  ]
+};
+
+function initRadioTab() {
+  const cList = document.getElementById("radioCodesList");
+  const sList = document.getElementById("radioSignalsList");
+  const pList = document.getElementById("radioPhoneticList");
+
+  if (!cList || !sList || !pList) return;
+
+  cList.innerHTML = "";
+  sList.innerHTML = "";
+  pList.innerHTML = "";
+
+  RADIO_DATA.codes.forEach(c => {
+    let parts = c.split(" ");
+    cList.innerHTML += `<div><b>${parts[0]}</b> ${parts.slice(1).join(" ")}</div>`;
+  });
+  
+  RADIO_DATA.signals.forEach(s => {
+    let parts = s.split(" ");
+    sList.innerHTML += `<div><b>${parts[0]}</b> ${parts.slice(1).join(" ")}</div>`;
+  });
+  
+  RADIO_DATA.phonetic.forEach(p => {
+    pList.innerHTML += `<div>${p}</div>`;
+  });
+}
+
+function stopTTS() {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume(); 
+}
+
+function speakTTS() {
+    const text = document.getElementById("ttsInput").value.trim();
+    if (!text) return;
+
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
+
+    setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US'; 
+        utterance.rate = 1.0;
+        utterance.pitch = 0.9;
+
+        let voices = window.speechSynthesis.getVoices();
+        
+        const doSpeak = (vList) => {
+            const preferredVoice = vList.find(v => v.name.includes("David") || v.name.includes("Guy")) 
+                                || vList.find(v => v.lang.startsWith("en-US")) 
+                                || vList[0];
+            if (preferredVoice) utterance.voice = preferredVoice;
+            window.speechSynthesis.speak(utterance);
+        };
+
+        if (voices.length === 0) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                doSpeak(window.speechSynthesis.getVoices());
+            };
+        } else {
+            doSpeak(voices);
+        }
+    }, 100);
+}
+
 /* ── Real browser voice input (Web Speech API) — click mic, speak, auto-submits ── */
 function setupVoice(){
   const micBtn = qs("#micBtn"), hint = qs("#micHint");
@@ -1930,7 +2074,6 @@ function wireEvents(){
   qs("#saveSettingsBtn").addEventListener("click", saveSettingsFromModal);
   qs("#selfHealBtn").addEventListener("click", runSelfHealUI);
 
-  qs("#codesBtn").addEventListener("click", () => openModal("codesModal"));
   qs("#historyBtn").addEventListener("click", () => { buildHistoryModal(); openModal("historyModal"); });
   qs("#clearHistBtn").addEventListener("click", clearHistoryUI);
 
@@ -1941,100 +2084,6 @@ function wireEvents(){
   qs("#dispatchInput").addEventListener("keydown", (e) => {
     if(e.key === "Enter"){ qs("#dispatchSendBtn").click(); }
   });
-}
-
-/* ════════════════════════════════════════════════════════════════════
-   SHIFT TIMER (OCSO ONLY)
-   ════════════════════════════════════════════════════════════════════ */
-let shiftInterval = null;
-let shiftStartTime = null;
-let shiftEndTime = null;
-
-function formatDuration(ms) {
-  const totalSeconds = Math.floor(ms / 1000);
-  const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-  const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-  const s = String(totalSeconds % 60).padStart(2, '0');
-  return `${h}:${m}:${s}`;
-}
-
-function clockIn() {
-  shiftStartTime = new Date();
-  shiftEndTime = null;
-  
-  qs("#shiftTimerStatus").textContent = "On Duty (OCSO)";
-  qs("#shiftTimerStatus").style.color = "var(--green)";
-  
-  qs("#clockInBtn").classList.add("hidden");
-  qs("#clockOutBtn").classList.remove("hidden");
-  
-  qs("#genShiftBtn").disabled = true;
-  const detailsCard = qs("#shiftDetailsCard");
-  detailsCard.style.opacity = "0.5";
-  detailsCard.style.pointerEvents = "none";
-  qs("#shiftOfficer").value = "";
-  qs("#shiftRank").value = "";
-  qs("#shiftNotes").value = "";
-  
-  shiftInterval = setInterval(() => {
-    const now = new Date();
-    qs("#shiftTimerDisplay").textContent = formatDuration(now - shiftStartTime);
-  }, 1000);
-  
-  toast("Clocked In to OCSO!");
-}
-
-function clockOut() {
-  clearInterval(shiftInterval);
-  shiftEndTime = new Date();
-  
-  qs("#shiftTimerStatus").textContent = "Off Duty (OCSO)";
-  qs("#shiftTimerStatus").style.color = "var(--red)";
-  
-  qs("#clockOutBtn").classList.add("hidden");
-  qs("#clockInBtn").classList.remove("hidden");
-  
-  qs("#genShiftBtn").disabled = false;
-  const detailsCard = qs("#shiftDetailsCard");
-  detailsCard.style.opacity = "1";
-  detailsCard.style.pointerEvents = "auto";
-  
-  toast("Clocked Out! Fill in your details.");
-}
-
-function genShiftLog() {
-  if(!shiftStartTime || !shiftEndTime) return;
-  
-  const username = qs("#shiftOfficer").value.trim() || "[Username]";
-  const rank = qs("#shiftRank").value.trim() || "[Rank]";
-  const notes = qs("#shiftNotes").value.trim() || "[No notes provided]";
-  
-  const startStr = shiftStartTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const endStr = shiftEndTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const duration = formatDuration(shiftEndTime - shiftStartTime);
-  
-  const output = 
-    "OUTAGAMIE COUNTY SHERIFF'S OFFICE - SHIFT REPORT\n\n" +
-    "Username: " + username + "\n" +
-    "Rank: " + rank + "\n" +
-    "Shift Duration: " + duration + " (" + startStr + " - " + endStr + ")\n" +
-    "Notes: " + notes + "\n" +
-    "Image Proof:";
-    
-  writeOutput("shiftOutput", output);
-  copyToClipboard(output);
-  appendHistory("shift", output);
-  toast("Shift Log generated and copied!");
-}
-
-function copyShiftLog() {
-  const text = qs("#shiftOutput").textContent;
-  if(text && text !== "Clock in, clock out, and generate to see the log.") {
-    copyToClipboard(text);
-    toast("Copied!");
-  } else {
-    toast("Generate a shift log first.");
-  }
 }
 
 /* ════════════════════════════════════════════════════════════════════
@@ -2050,6 +2099,7 @@ function init(){
   setupVoice();
   refreshQueue();
   applyOfficerDefaults();
+  initRadioTab();
   dispatchReply('Dispatch ready. Try "generate citation", "add reckless driving", "open settings", or "help".');
 }
 
