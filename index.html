@@ -2007,12 +2007,12 @@ function genShiftLog() {
   const duration = formatDuration(shiftEndTime - shiftStartTime);
   
   const output = 
-    "`OUTAGAMIE COUNTY SHERIFF'S OFFICE - SHIFT REPORT`\n\n" +
-    "`Username:` " + username + "\n" +
-    "`Rank:` " + rank + "\n" +
-    "`Shift Duration:` " + duration + " (" + startStr + " - " + endStr + ")\n" +
-    "`Notes:` " + notes + "\n" +
-    "`Image Proof:`";
+    "OUTAGAMIE COUNTY SHERIFF'S OFFICE - SHIFT REPORT\n\n" +
+    "Username: " + username + "\n" +
+    "Rank: " + rank + "\n" +
+    "Shift Duration: " + duration + " (" + startStr + " - " + endStr + ")\n" +
+    "Notes: " + notes + "\n" +
+    "Image Proof:";
     
   writeOutput("shiftOutput", output);
   copyToClipboard(output);
