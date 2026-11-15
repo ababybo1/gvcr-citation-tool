@@ -629,96 +629,96 @@
   </section>
 
   <!-- ── RADIO COMM TAB ───────────────────────────────────────────────── -->
-<section class="tab-panel" id="tab-radio" style="flex-direction: column; overflow-y: auto;">
+  <section class="tab-panel" id="tab-radio">
     
-    <!-- TOP: Text-to-Speech -->
-    <div class="card" style="margin-bottom:14px; flex-shrink:0;">
-      <p class="section-label">📢 Text-to-Speech Radio</p>
-      <p style="font-size:11px;color:var(--muted);margin:0 0 10px;">
-        Type your radio transmission below. Click Speak to play it out loud.
-      </p>
-      <div class="field-wrap" style="margin-bottom:10px;">
-        <textarea id="ttsInput" rows="2" placeholder="e.g. 10-4, show me 10-8 at the Speedway..."></textarea>
-      </div>
-      <div class="btn-row" style="max-width:400px;">
-        <button class="btn btn-accent" onclick="speakTTS()">🔊 Speak</button>
-        <button class="btn btn-red" onclick="stopTTS()">🛑 Stop</button>
-      </div>
-    </div>
-
-    <!-- BOTTOM: 2-Column Layout (Codes Left, Guide Right) -->
-    <div style="display:flex; gap:14px; width:100%; align-items:flex-start; flex-wrap: wrap;">
+    <!-- LEFT SIDE (TTS + Codes) -->
+    <div style="flex:1; display:flex; flex-direction:column; min-width:0; gap:8px;">
       
-      <!-- LEFT SIDE: 10-Codes, Signals, Phonetic -->
-      <div style="flex:1; display:grid; grid-template-columns: 1fr 1fr; gap:14px; align-items:start; min-width: 400px;">
+      <!-- TTS Box -->
+      <div class="card" style="flex-shrink:0;">
+        <p class="section-label">📢 Text-to-Speech Radio</p>
+        <p style="font-size:11px;color:var(--muted);margin:0 0 10px;">
+          Type your radio transmission below. Click Speak to play it out loud.
+        </p>
+        <div class="field-wrap" style="margin-bottom:10px;">
+          <textarea id="ttsInput" rows="2" placeholder="e.g. 10-4, show me 10-8 at the Speedway..."></textarea>
+        </div>
+        <div class="btn-row" style="max-width:400px;">
+          <button class="btn btn-accent" onclick="speakTTS()">🔊 Speak</button>
+          <button class="btn btn-red" onclick="stopTTS()">🛑 Stop</button>
+        </div>
+      </div>
+
+      <!-- Codes List -->
+      <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-right:4px;">
         
-        <div class="card" style="margin:0;">
+        <div class="card" style="margin:0; flex-shrink:0;">
           <p class="section-label" style="color:var(--accent);">10-Codes</p>
           <div id="radioCodesList" style="font-size:12px; line-height:1.6; column-count: 2;"></div>
         </div>
         
-        <div class="card" style="margin:0;">
+        <div class="card" style="margin:0; flex-shrink:0;">
           <p class="section-label" style="color:var(--orange);">Signals & Codes</p>
           <div id="radioSignalsList" style="font-size:12px; line-height:1.6;"></div>
         </div>
 
-        <div class="card" style="margin:0;">
+        <div class="card" style="margin:0; flex-shrink:0;">
           <p class="section-label" style="color:var(--cyan);">Phonetic Alphabet</p>
           <div id="radioPhoneticList" style="font-size:12px; line-height:1.6; column-count:3;"></div>
         </div>
 
       </div>
+    </div>
 
-      <!-- RIGHT SIDE: Radio Guide -->
-      <div style="width: 320px; flex-shrink: 0;">
-        <div class="card" style="margin:0;">
-          <p class="section-label" style="color:var(--yellow);">📖 Radio Guide</p>
-          
-          <div style="font-size:12px; line-height:1.5; color:var(--text2);">
-            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Going Busy (10-6, 10-11, 10-50):</p>
-            <p style="margin-bottom:15px;">When clear, report back in RTO: <br><i>"(Callsign) Show me back 10-8"</i></p>
+    <!-- RIGHT SIDE (Radio Guide) -->
+    <div style="width:390px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; overflow-y:auto; padding-right:2px;">
+      <div class="card" style="margin:0;">
+        <p class="section-label" style="color:var(--yellow);">📖 Radio Guide</p>
+        
+        <div style="font-size:12px; line-height:1.5; color:var(--text2);">
+          <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Going Busy (10-6, 10-11, 10-50):</p>
+          <p style="margin-bottom:15px;">When clear, report back in RTO: <br><i>"(Callsign) Show me back 10-8"</i></p>
 
-            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Starting/Ending Shift:</p>
-            <p style="margin-bottom:5px;">Start: <i>"(Callsign) Show me 10-8, 10-41 for the Wisconsin State Patrol"</i></p>
-            <p style="margin-bottom:15px;">End: <i>"(Callsign) Show me 10-7, 10-42 for the Wisconsin State Patrol"</i></p>
+          <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Starting/Ending Shift:</p>
+          <p style="margin-bottom:5px;">Start: <i>"(Callsign) Show me 10-8, 10-41 for the Wisconsin State Patrol"</i></p>
+          <p style="margin-bottom:15px;">End: <i>"(Callsign) Show me 10-7, 10-42 for the Wisconsin State Patrol"</i></p>
 
-            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Traffic Stops (Correct):</p>
-            <p style="margin-bottom:5px;"><i>"(Callsign) Show me on a 10-11 with a (doors) (Vehicle Type), 10-28 reading (State Tag) Tag (Letters). 10-20 is going to be Driving (N,E,W,S)bound (Street name) near (location), 10-32 is/not Required"</i></p>
-            <p style="margin-bottom:15px;">Example: <i>"103 Show me on a 10-11 with a 4 door SUV 10-28 reading Wisconsin Tag Alpha Bravo Charlie 123 10-20 is going to be driving Northbound Greenville Dr near Cenex, 10-32 not required."</i></p>
+          <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Traffic Stops (Correct):</p>
+          <p style="margin-bottom:5px;"><i>"(Callsign) Show me on a 10-11 with a (doors) (Vehicle Type), 10-28 reading (State Tag) Tag (Letters). 10-20 is going to be Driving (N,E,W,S)bound (Street name) near (location), 10-32 is/not Required"</i></p>
+          <p style="margin-bottom:15px;">Example: <i>"103 Show me on a 10-11 with a 4 door SUV 10-28 reading Wisconsin Tag Alpha Bravo Charlie 123 10-20 is going to be driving Northbound Greenville Dr near Cenex, 10-32 not required."</i></p>
 
-            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Traffic Stops (Acceptable):</p>
-            <p style="margin-bottom:5px;"><i>"(callsign) Show me on a 10-11 with a (car Description) reading (License Plate letters) 10-20 (location) 10-32 required/not required"</i></p>
-            <p style="margin-bottom:15px;">Example: <i>"103 Show me on a 10-11 with a blue BKM reading Alpha Bravo Charlie 123 10-20 is cenex no 10-32 Required"</i></p>
-            <p style="margin-bottom:15px; color:var(--red);">*If felony stop or arrest stop, advise its a Code 5.*</p>
+          <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Traffic Stops (Acceptable):</p>
+          <p style="margin-bottom:5px;"><i>"(callsign) Show me on a 10-11 with a (car Description) reading (License Plate letters) 10-20 (location) 10-32 required/not required"</i></p>
+          <p style="margin-bottom:15px;">Example: <i>"103 Show me on a 10-11 with a blue BKM reading Alpha Bravo Charlie 123 10-20 is cenex no 10-32 Required"</i></p>
+          <p style="margin-bottom:15px; color:var(--red);">*If felony stop or arrest stop, advise its a Code 5.*</p>
 
-            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">911 Calls:</p>
-            <p style="margin-bottom:5px;"><i>"(Callsign) Show me 10-97 to the 911 call, 10-20 is (location)"</i></p>
-            <p style="margin-bottom:15px;">If location unknown, say "Unknown".</p>
+          <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">911 Calls:</p>
+          <p style="margin-bottom:5px;"><i>"(Callsign) Show me 10-97 to the 911 call, 10-20 is (location)"</i></p>
+          <p style="margin-bottom:15px;">If location unknown, say "Unknown".</p>
 
-            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Motor Vehicle Accidents:</p>
-            <p style="margin-bottom:5px;"><i>"(Callsign) Show me 10-23 (Major/Minor) 10-50, 10-20 is going to be (location)"</i></p>
-            <p style="margin-bottom:15px;">Example: <i>"103 Show me on a Major 10-50, 10-20 is going to be fox mountain near the intersection"</i></p>
+          <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Motor Vehicle Accidents:</p>
+          <p style="margin-bottom:5px;"><i>"(Callsign) Show me 10-23 (Major/Minor) 10-50, 10-20 is going to be (location)"</i></p>
+          <p style="margin-bottom:15px;">Example: <i>"103 Show me on a Major 10-50, 10-20 is going to be fox mountain near the intersection"</i></p>
 
-            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Priority (Pursuits):</p>
-            <p style="margin-bottom:5px;"><i>"(Callsign) 10-80 10-80, 10-20 is going to be driving (N,E,W,S)bound (street name) passing/at (location) Signal 100 in affect"</i></p>
-            <p style="margin-bottom:5px;">Example: <i>"103 10-80 10-80 10-20 is going to be driving northbound GV Dr passing fox mountain signal 100 in affect"</i></p>
-            <p style="margin-bottom:15px;">*Report speed, turns, behavior, request PIT. Callsign changes to your position (1st Priority, 2nd Secondary, 3rd Tertiary, etc).*</p>
+          <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Priority (Pursuits):</p>
+          <p style="margin-bottom:5px;"><i>"(Callsign) 10-80 10-80, 10-20 is going to be driving (N,E,W,S)bound (street name) passing/at (location) Signal 100 in affect"</i></p>
+          <p style="margin-bottom:5px;">Example: <i>"103 10-80 10-80 10-20 is going to be driving northbound GV Dr passing fox mountain signal 100 in affect"</i></p>
+          <p style="margin-bottom:15px;">*Report speed, turns, behavior, request PIT. Callsign changes to your position (1st Priority, 2nd Secondary, 3rd Tertiary, etc).*</p>
 
-            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Direct:</p>
-            <p style="margin-bottom:5px;">To speak to someone specifically: <i>"(Callsign) Direct (their Callsign)"</i></p>
-            <p style="margin-bottom:5px;">They reply: <i>"(your callsign) Direct"</i></p>
-            <p style="margin-bottom:15px;">Example: 103: <i>"103 Direct 102"</i> | 102: <i>"103 Direct"</i> | 103: <i>"(message)"</i></p>
+          <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Direct:</p>
+          <p style="margin-bottom:5px;">To speak to someone specifically: <i>"(Callsign) Direct (their Callsign)"</i></p>
+          <p style="margin-bottom:5px;">They reply: <i>"(your callsign) Direct"</i></p>
+          <p style="margin-bottom:15px;">Example: 103: <i>"103 Direct 102"</i> | 102: <i>"103 Direct"</i> | 103: <i>"(message)"</i></p>
 
-            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Switching Frequency:</p>
-            <p style="margin-bottom:15px;"><i>"(Callsign) Show me 10-1 (VC channel)"</i></p>
+          <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Switching Frequency:</p>
+          <p style="margin-bottom:15px;"><i>"(Callsign) Show me 10-1 (VC channel)"</i></p>
 
-            <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Backup Calls:</p>
-            <p style="margin-bottom:5px;"><i>"(Callsign) Requesting 10-32, My 10-20 is going to be (location) Code (1-2-3). For a (Reason)."</i></p>
-          </div>
+          <p style="margin-bottom:10px; color:var(--cyan); font-weight:bold;">Backup Calls:</p>
+          <p style="margin-bottom:5px;"><i>"(Callsign) Requesting 10-32, My 10-20 is going to be (location) Code (1-2-3). For a (Reason)."</i></p>
         </div>
       </div>
-
     </div>
+
   </section>
 </main>
 
@@ -731,7 +731,6 @@
       <p class="section-label">Officer Defaults</p>
       <label class="field-label">Officer Name</label>
       <div class="field-wrap"><input id="setOfficerName"></div>
-      <label class="field-label">Badge Number</label>
       <div class="field-wrap"><input id="setBadge"></div>
       <label class="field-label">Callsign</label>
       <div class="field-wrap"><input id="setCallsign"></div>
@@ -1772,6 +1771,11 @@ function clockOut() {
   const detailsCard = qs("#shiftDetailsCard");
   detailsCard.style.opacity = "1";
   detailsCard.style.pointerEvents = "auto";
+
+  const shiftUser = qs("#shiftOfficer");
+  if(!shiftUser.value.trim() && state.settings.officer_name) {
+    shiftUser.value = state.settings.officer_name;
+  }
   
   toast("Clocked Out! Fill in your details.");
 }
@@ -1779,7 +1783,7 @@ function clockOut() {
 function genShiftLog() {
   if(!shiftStartTime || !shiftEndTime) return;
   
-  const username = qs("#shiftOfficer").value.trim() || "[Username]";
+  const username = qs("#shiftOfficer").value.trim() || state.settings.officer_name || "[Username]";
   const rank = qs("#shiftRank").value.trim() || "[Rank]";
   const notes = qs("#shiftNotes").value.trim() || "[No notes provided]";
   
@@ -1986,7 +1990,6 @@ function pickTheme(name){
 }
 function openSettingsModal(){
   qs("#setOfficerName").value = state.settings.officer_name || "";
-  qs("#setBadge").value = state.settings.badge_number || "";
   qs("#setCallsign").value = state.settings.callsign || "";
   qs("#setDivision").value = state.settings.division || "";
   qs("#setGreeting").value = state.settings.greeting_template || "";
@@ -1997,7 +2000,6 @@ function openSettingsModal(){
 }
 function saveSettingsFromModal(){
   state.settings.officer_name = qs("#setOfficerName").value.trim();
-  state.settings.badge_number = qs("#setBadge").value.trim();
   state.settings.callsign = qs("#setCallsign").value.trim();
   state.settings.division = qs("#setDivision").value.trim();
   state.settings.greeting_template = qs("#setGreeting").value.trim();
@@ -2009,11 +2011,16 @@ function saveSettingsFromModal(){
 function applyOfficerDefaults(){
   const name = state.settings.officer_name?.trim();
   if(!name) return;
-  const field = qs("#fProvider");
-  if(!field.value.trim() || field.dataset.lastApplied === field.value){
-    field.value = name;
-    field.dataset.lastApplied = name;
-  }
+
+  const fields = ["#fProvider", "#aOfficers", "#wOfficers"];
+  
+  fields.forEach(selector => {
+    const field = qs(selector);
+    if(field && (!field.value.trim() || field.dataset.lastApplied === field.value)){
+      field.value = name;
+      field.dataset.lastApplied = name;
+    }
+  });
 }
 function runSelfHealUI(){
   const report = selfHeal();
