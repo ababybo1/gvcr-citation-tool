@@ -184,23 +184,26 @@
   .sec-btn { background:var(--card2); color:var(--muted); font-size:11px; font-weight:600; padding:7px 11px; border-radius:6px; transition:background .35s ease,color .2s ease; }
   .sec-btn:hover { background:var(--border); }
   .sec-btn.active { background:var(--accent); color:var(--text); }
-
   .code-list-wrap { flex:1; overflow-y:auto; background:var(--card); border:1px solid var(--border); border-radius:8px; }
   .code-header-row { background:var(--indigo); color:var(--text); padding:10px 14px; font-weight:700; font-size:13px; position:sticky; top:0; z-index:2; }
   .col-heads { display:flex; background:var(--card2); padding:6px 10px; font-size:10px; font-weight:700; color:var(--muted); position:sticky; top:34px; z-index:1; }
   .col-heads span:nth-child(1){width:70px;} .col-heads span:nth-child(2){flex:1;} .col-heads span:nth-child(3){width:170px;} .col-heads span:nth-child(4){width:90px;}
 
-  .code-row { display:flex; align-items:center; padding:6px 8px; border-left:3px solid transparent; gap:8px; }
-  .code-row:nth-child(odd) { background:var(--card); }
-  .code-row:nth-child(even) { background:var(--card2); }
+  .code-row-wrap { display: flex; flex-direction: column; }
+  .code-list-wrap > .code-row-wrap:nth-of-type(odd) { background: var(--card); }
+  .code-list-wrap > .code-row-wrap:nth-of-type(even) { background: var(--card2); }
+
+  .code-row { display:flex; align-items:center; padding:6px 8px; border-left:3px solid transparent; gap:8px; background:transparent; }
   .code-row:hover { background:var(--sel) !important; cursor:pointer; }
   .code-row.cls-Citation { border-left-color:var(--class-citation-border); }
   .code-row.cls-Misdemeanor { border-left-color:var(--class-misdemeanor-border); }
   .code-row.cls-Felony { border-left-color:var(--class-felony-border); }
+
   .badge { font-family:"Courier New",monospace; font-weight:700; font-size:11px; padding:5px 7px; border-radius:4px; width:56px; text-align:center; flex-shrink:0; }
   .badge.cls-Citation { background:var(--green-d); color:var(--green); }
   .badge.cls-Misdemeanor { background:var(--orange-d); color:var(--orange); }
   .badge.cls-Felony { background:var(--red-d); color:var(--red); }
+
   .ref-text { flex:1; font-size:12px; color:var(--text2); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .ref-text.match { color:var(--yellow); }
   .pen-text { width:170px; font-size:11px; color:var(--muted); flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -208,8 +211,19 @@
   .cls-pill.cls-Citation { background:var(--green-d); color:var(--green); }
   .cls-pill.cls-Misdemeanor { background:var(--orange-d); color:var(--orange); }
   .cls-pill.cls-Felony { background:var(--red-d); color:var(--red); }
+  
   .add-btn { background:var(--indigo); color:var(--text); font-size:11px; font-weight:700; padding:5px 10px; border-radius:5px; flex-shrink:0; }
   .add-btn:hover { background:var(--indigo-h); }
+
+  .code-note {
+    padding: 4px 10px 8px 12px;
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    background: transparent;
+    border-left: 3px solid transparent;
+    margin-top: -4px;
+  }
 
   /* ── Charge queue + chart ──────────────────────────────────────────── */
   .totals-row { display:flex; justify-content:space-between; align-items:center; }
@@ -1230,6 +1244,8 @@ function renderCodeList(query){
     for(const [code, ref, penalty, cls] of matches){
       shown++;
 
+      const rowWrap = el("div", {class: "code-row-wrap"});
+
       const row = el("div", {class:`code-row cls-${cls}`});
       row.appendChild(el("div", {class:`badge cls-${cls}`, text:code}));
 
@@ -1253,9 +1269,19 @@ function renderCodeList(query){
         addCharge(sec, code, ref, penalty, cls)
       );
 
-      wrap.appendChild(row);
+      rowWrap.appendChild(row);
+
+      if (CODE_NOTES[code]) {
+        const noteEl = el("div", {
+          class: "code-note", 
+          text: "↳ " + CODE_NOTES[code]
+        });
+        rowWrap.appendChild(noteEl);
+      }
+
+      wrap.appendChild(rowWrap);
     }
-  }
+  } 
 
   if(!shown){
     wrap.appendChild(el("div", {
@@ -1364,7 +1390,10 @@ function writeOutput(id, text){ qs("#"+id).textContent = text; }
 function tally(arr){
   const m = new Map();
   arr.forEach(v => m.set(v, (m.get(v) || 0) + 1));
-  return [...m].map(([k, n]) => n > 1 ? `${k} x${n}` : k).join(", ");
+  return [...m].map(([k, n]) => {
+    const formatted = k.replace(/\((\d+)\)/, "($1) ");
+    return n > 1 ? `${formatted} x${n}` : formatted;
+  }).join(", ");
 }
 
 function sortedCharges(){
@@ -1401,10 +1430,10 @@ function genCitation(){
 
   state.lastCit =
     "Ticket Provider: " + prov +
-    "\nSection: " + codes +
+    "\nPenal Code: " + codes +
     "\nReference: " + refs +
-    "\nPenalty: " + pen +
     "\nClassification: " + clss +
+    "\nPenalty: " + pen +
     "\nCount: " + charges.length +
     "\nOffender: " + off;
 
@@ -1552,7 +1581,7 @@ function computeDynamicPhrase(key){
   if(key === "__DYNAMIC_CITED__"){
     if(!state.charges.length) return "You are being cited for the following violation(s):\n  (no charges added yet)";
     const lines = ["You are being cited for the following violation(s):"];
-    for(const c of state.charges) lines.push(`  • ${c.code} ${c.ref} — ${c.penalty}`);
+    for(const c of state.charges) lines.push(`  • ${c.code.replace(/\((\d+)\)/, "($1) ")} ${c.ref} — ${c.penalty}`);
     return lines.join("\n");
   }
   if(key === "__DYNAMIC_GREETING__"){
