@@ -878,9 +878,11 @@ const PENAL_CODES = {
     ["(2)01","Driving on Learner's Permit Without Supervision","$500 + Impoundment of Vehicle","Misdemeanor"],
     ["(2)02","Driving with No / Invalid Vehicle Insurance","$750 + Impoundment of Vehicle","Misdemeanor"],
     ["(2)03","Driving with No / Invalid Vehicle Registration","$500 + Impoundment of Vehicle","Misdemeanor"],
-    ["(2)04","Driving on a Suspended License","$1,000 + 60 Seconds of Jail Time + Impoundment of the Vehicle","Felony"],
+    ["(2)04","Driving on a Suspended License","$1,000 + 60 Seconds of Jail Time + Impoundment of Vehicle","Felony"],
     ["(2)05","Failure to Sign a Citation","$1,000 + 30 Seconds of Jail Time","Misdemeanor"],
-    ["(2)06","Operating Without a Valid License","$7,500 + 180 Seconds of Jail Time","Felony"]
+    ["(2)06","Operating Without a Valid License","$7,500 + 180 Seconds of Jail Time","Felony"],
+    ["(2)07","Operating with Fake Documentation","$5,000 + 60 Seconds of Jail Time","Felony"],
+    ["(2)08","Operating with No Possession of Documentation","$2,500 + Impoundment of Vehicle","Misdemeanor"]
   ],
   "Section 3: Crime Against Property": [
     ["(3)01","Vandalism","$1,000 + 60 Seconds of Jail Time","Misdemeanor"],
@@ -1884,39 +1886,6 @@ function initRadioTab() {
 function stopTTS() {
     window.speechSynthesis.cancel();
     window.speechSynthesis.resume(); 
-}
-
-function speakTTS() {
-    const text = document.getElementById("ttsInput").value.trim();
-    if (!text) return;
-
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.resume();
-
-    setTimeout(() => {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US'; 
-        utterance.rate = 1.0;
-        utterance.pitch = 0.9;
-
-        let voices = window.speechSynthesis.getVoices();
-        
-        const doSpeak = (vList) => {
-            const preferredVoice = vList.find(v => v.name.includes("David") || v.name.includes("Guy")) 
-                                || vList.find(v => v.lang.startsWith("en-US")) 
-                                || vList[0];
-            if (preferredVoice) utterance.voice = preferredVoice;
-            window.speechSynthesis.speak(utterance);
-        };
-
-        if (voices.length === 0) {
-            window.speechSynthesis.onvoiceschanged = () => {
-                doSpeak(window.speechSynthesis.getVoices());
-            };
-        } else {
-            doSpeak(voices);
-        }
-    }, 100);
 }
 
 /* ── Real browser voice input (Web Speech API) — click mic, speak, auto-submits ── */
